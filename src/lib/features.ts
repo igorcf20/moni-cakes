@@ -82,8 +82,8 @@ export const FEATURES: FeatureDef[] = [
   { id: 'admin_2fa', category: 'security', defaultOn: true, configSection: 'account-security' },
   { id: 'social_login', category: 'customers', defaultOn: false, configSection: 'account-security' },
   // Ferramentas do site
-  { id: 'quote_3d', category: 'tools', defaultOn: true },
-  { id: 'customizer', category: 'tools', defaultOn: true },
+  { id: 'quote_3d', category: 'tools', defaultOn: false },
+  { id: 'customizer', category: 'tools', defaultOn: false },
 ];
 
 export type FeatureFlags = Record<string, boolean>;

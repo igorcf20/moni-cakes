@@ -5,11 +5,14 @@
 export type MediaKey =
   | 'hero'
   | 'cat-decoracao' | 'cat-organizacao' | 'cat-suportes' | 'cat-geek' | 'cat-casa' | 'cat-personalizados'
+  | 'moni/thumb-classico' | 'moni/thumb-recheado' | 'moni/thumb-personalizado' | 'moni/fatia-morango'
   | 'mega-novidades' | 'banner-crie' | 'banner-pla' | 'share'
   | 'insp-1' | 'insp-2' | 'insp-3' | 'insp-4' | 'insp-5' | 'insp-6'
   | 'story-1' | 'story-2';
 
 const AVAILABLE: MediaKey[] = [
+  // Moni Cakes: fotos provisórias das categorias do cardápio (public/images/moni/).
+  'moni/thumb-classico', 'moni/thumb-recheado', 'moni/thumb-personalizado', 'moni/fatia-morango',
   'hero', 'banner-pla', 'cat-decoracao', 'cat-organizacao', 'cat-suportes', 'cat-geek', 'cat-casa', 'cat-personalizados',
   'insp-1', 'insp-2', 'insp-3', 'insp-4', 'insp-5', 'insp-6', 'story-1', 'story-2',
 ];

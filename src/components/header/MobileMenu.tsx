@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useFeature, useHrefOn } from "@/hooks/useFeatures";
-import { ChevronRight, Flame, Gift, Heart, LogOut, Shield, Sparkles, Star, Upload, UserRound, Wand2, X, type LucideIcon } from 'lucide-react';
+import { ChevronRight, Flame, Gift, Heart, LogOut, Shield, Sparkles, Star, UserRound, X, type LucideIcon } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Logo } from '@/components/brand/Logo';
@@ -27,7 +27,7 @@ export function MobileMenu({ open, onOpenChange, signedIn, isAdmin, onSignOut }:
   const close = () => onOpenChange(false);
   const shortcuts: [LucideIcon, string, string][] = [
     [Flame, t('offers'), LISTINGS.offers], [Sparkles, t('quick_new'), LISTINGS.new], [Star, t('quick_best'), LISTINGS.best],
-    [Wand2, t('sub_create'), '/personalizar'], [Upload, t('sub_upload'), '/orcamento-3d'], [Gift, t('quick_gifts'), LISTINGS.gifts],
+    [Gift, t('quick_gifts'), LISTINGS.gifts],
   ];
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>

@@ -3,9 +3,7 @@ import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { MotionConfig, useReducedMotion } from 'framer-motion';
-import {
-  Box, Cable, Dog, Flower2, Gamepad2, Headphones, KeyRound, Lamp, SearchX, Smartphone, Sprout, type LucideIcon,
-} from 'lucide-react';
+import { SearchX } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { LayerArt } from '@/components/MediaImage';
@@ -41,19 +39,12 @@ export function ListingShell({ children }: { children: ReactNode }) {
   );
 }
 
-type LT = ReturnType<typeof useMessages<typeof layoutMessages['pt-BR']>>['t'];
-const IDEAS: [Parameters<LT>[0], LucideIcon][] = [
-  ['demo_dragon', Gamepad2], ['demo_vase', Flower2], ['demo_organizer', Box], ['demo_phone', Smartphone], ['demo_lamp', Lamp],
-  ['demo_keychain', KeyRound], ['demo_planter', Sprout], ['demo_headphone', Headphones], ['demo_cable', Cable], ['demo_octopus', Dog],
-];
-
-/** Ideias para o catálogo vazio: as subcategorias da categoria ou exemplos gerais (sempre com o selo "Em breve"). */
+/** Ideias para o catálogo vazio: as subcategorias da categoria ou as categorias do cardápio (sempre com o selo "Em breve"). */
 function useIdeas(listing: Listing) {
-  const { t } = useMessages(layoutMessages);
+  const menu = useCatalogMenu();
   const c = listing.category;
-  if (!c) return IDEAS.map(([k, Icon]) => ({ name: t(k), Icon }));
-  const subs = c.subs.filter((s) => s.slug).map((s) => ({ name: s.label, Icon: c.Icon }));
-  return c.slug === 'personalizados' ? [...subs, { name: t('demo_keychain'), Icon: KeyRound }] : subs;
+  if (!c) return menu.map((m) => ({ name: m.name, Icon: m.Icon }));
+  return c.subs.filter((s) => s.slug).map((s) => ({ name: s.label, Icon: c.Icon }));
 }
 
 /**

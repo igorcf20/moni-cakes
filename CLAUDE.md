@@ -412,8 +412,8 @@ que a loja faz, `docs/MEMORIA.md` se o dono decidiu algo novo, `docs/GUIA-VISUAL
 - Cabeçalho (`src/components/Header.tsx` + `src/components/header/*`): duas linhas sticky, busca com sugestões, categorias,
   histórico e miniaturas (`SearchBox`), botão laranja Todas as categorias com `MegaMenu`, menu lateral com acordeão no celular.
 - Catálogo: menu = Admin > Categorias (`categories`: `icon`, `name_i18n`, `link_url`, `show_in_menu`), montado por
-  `src/lib/catalogMenu.ts` e `useCatalogMenu()` (`src/hooks/useCatalogMenu.ts`); sem categorias no menu, o catálogo padrão
-  `src/lib/catalog.ts` (6 categorias e subcategorias), que o Admin copia para o banco. Destaques do mega menu: `store_settings.mega_menu` (`src/lib/megaMenu.ts`, `pickFeatured`), banner `CategoryBanner` em `MegaMenu`
+  `src/lib/catalogMenu.ts` e `useCatalogMenu()` (`src/hooks/useCatalogMenu.ts`); sem categorias no menu, o cardápio padrão
+  `src/lib/catalog.ts` (Moni Cakes: 4 categorias de bolos com subcategorias), que o Admin copia para o banco. Destaques do mega menu: `store_settings.mega_menu` (`src/lib/megaMenu.ts`, `pickFeatured`), banner `CategoryBanner` em `MegaMenu`
   e faixa no `MobileMenu`; Admin > Categorias > Menu de categorias (`admin/categories/MegaMenuSettings`, `?tab=categories&ver=menu`). Slug de sub = `<categoria>-<sub>`. Fotos: `src/lib/media.ts` (chaves e `AVAILABLE`), ficheiros em
   `public/images/<chave>.webp`; sem foto, `MediaImage` mostra `LayerArt` (reserva com linhas de camada).
 - Catálogo inicial: na Moni Cakes as migrations `20261005190000_produto_base_vaso.sql` e `20261025180000_catalogo_inicial.sql`
@@ -472,9 +472,9 @@ que a loja faz, `docs/MEMORIA.md` se o dono decidiu algo novo, `docs/GUIA-VISUAL
 ## Pendências
 
 - Moni Cakes: fotos reais dos bolos; número de WhatsApp e redes no Admin; textos reais do preparo e da página Sobre;
-  categorias do cardápio (o menu padrão `src/lib/catalog.ts`, os textos de `src/i18n/layout.ts` e as fotos de
-  `src/lib/media.ts` ainda são da loja 3D até haver categorias no Admin); desligar no Admin os recursos de 3D
-  (Orçamento 3D, personalizador). Loja online em https://monicakes.kodemi.pt desde 5/11/2026 (HTTPS, sync e cópias
+  confirmar com o dono as categorias do cardápio padrão (`src/lib/catalog.ts`: Bolos clássicos, Bolos recheados, Bolos
+  personalizados, Fatias e doces; fotos provisórias); cadastrar os bolos reais no Admin. Orçamento 3D e personalizador
+  vêm desligados por padrão (`defaultOn: false` em `src/lib/features.ts`). Loja online em https://monicakes.kodemi.pt desde 5/11/2026 (HTTPS, sync e cópias
   diárias ligados); falta o primeiro administrador e o dono preencher os dados da loja no Admin.
 
 - O site da empresa em `kodemi.pt` nunca é tocado: só subdomínios (a loja-modelo PRINT3D está em loja3d.kodemi.pt).

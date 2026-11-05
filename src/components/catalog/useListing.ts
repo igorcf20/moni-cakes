@@ -123,12 +123,10 @@ export type Listing = ReturnType<typeof useListing>;
 /* ------------------------------------------------------------------ */
 
 const LEAD: Record<string, keyof CatalogMessages> = {
-  decoracao: 'lead_decoracao',
-  organizacao: 'lead_organizacao',
-  suportes: 'lead_suportes',
-  geek: 'lead_geek',
-  casa: 'lead_casa',
-  personalizados: 'lead_personalizados',
+  'bolos-classicos': 'lead_classicos',
+  'bolos-recheados': 'lead_recheados',
+  'bolos-personalizados': 'lead_personalizados',
+  'fatias-e-doces': 'lead_fatias',
 };
 
 export function useListingText(l: Listing) {

@@ -98,6 +98,21 @@ export function useMoniMotion(root: RefObject<HTMLElement>, ready: boolean) {
             .to(q(hero, '[data-mc-title]'), { autoAlpha: 0, duration: 0.5 }, 0.8)
             .to(stage, { scale: 0.94, yPercent: -16, duration: 0.8 }, 1.0)
             .to(petals, { autoAlpha: 0, duration: 0.4 }, 1.0);
+        } else {
+          // Celular e tablet: sem fixar o hero (rolagem natural), mas a cena acompanha o dedo: o título sobe e
+          // apaga, o bolo aproxima-se, a decoração e as pétalas sobem em velocidades diferentes e a luz muda.
+          const stage = hero.querySelector('[data-mc-stage]');
+          const scroll = gsap.timeline({
+            defaults: { ease: 'none' },
+            scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.4 },
+          });
+          scroll
+            .to(q(hero, '[data-mc-title]'), { yPercent: -45, autoAlpha: 0.15, duration: 1 }, 0)
+            .to(stage, { scale: 1.12, yPercent: -10, duration: 1 }, 0)
+            .to(q(hero, '[data-mc-layer="deco"]'), { yPercent: (i) => -14 - (i % 3) * 10, duration: 1 }, 0)
+            .to(petals, { yPercent: (i) => -120 - i * 40, rotation: (i) => (i % 2 ? 50 : -40), duration: 1 }, 0)
+            .to(q(hero, '[data-mc-light]'), { opacity: 1, duration: 1 }, 0)
+            .to(q(hero, '.mc-hero__scroll, [data-mc-badge]'), { autoAlpha: 0, duration: 0.3 }, 0);
         }
 
         // Fontes e imagens mudam alturas: recalcula as posições depois de carregarem.
@@ -122,8 +137,18 @@ export function useMoniMotion(root: RefObject<HTMLElement>, ready: boolean) {
         const cakes = el.querySelector('[data-mc-cakes]');
         if (cakes) {
           gsap.from(q(cakes, '[data-mc-reveal-line]'), { yPercent: 110, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: cakes, start: 'top 75%' } });
-          gsap.from(q(cakes, '[data-mc-fade]'), { autoAlpha: 0, y: 16, duration: 0.7, stagger: 0.1, ease: 'power2.out', scrollTrigger: { trigger: cakes, start: 'top 70%' } });
-          gsap.from(q(cakes, '[data-mc-card]'), { autoAlpha: 0, y: 60, scale: 0.97, duration: 0.9, stagger: 0.12, ease: 'power3.out', scrollTrigger: { trigger: q(cakes, '[data-mc-cards]')[0] ?? cakes, start: 'top 80%' } });
+          if (desktop) {
+            gsap.from(q(cakes, '[data-mc-fade]'), { autoAlpha: 0, y: 16, duration: 0.7, stagger: 0.1, ease: 'power2.out', scrollTrigger: { trigger: cakes, start: 'top 70%' } });
+          } else {
+            q(cakes, '[data-mc-fade]').forEach((node) => gsap.from(node, { autoAlpha: 0, y: 16, duration: 0.7, ease: 'power2.out', scrollTrigger: { trigger: node, start: 'top 90%' } }));
+          }
+          const cards = q(cakes, '[data-mc-card]');
+          if (desktop) {
+            gsap.from(cards, { autoAlpha: 0, y: 60, scale: 0.97, duration: 0.9, stagger: 0.12, ease: 'power3.out', scrollTrigger: { trigger: q(cakes, '[data-mc-cards]')[0] ?? cakes, start: 'top 80%' } });
+          } else {
+            // No celular os cartões ficam empilhados: cada um entra quando chega ao ecrã.
+            cards.forEach((card) => gsap.from(card, { autoAlpha: 0, y: 50, scale: 0.96, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: card, start: 'top 88%' } }));
+          }
         }
 
         // ---------- Cena 3: a fatia aproxima-se e os passos aparecem ----------
