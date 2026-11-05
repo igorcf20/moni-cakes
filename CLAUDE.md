@@ -15,7 +15,7 @@ loja-modelo: o visual da Moni Cakes está em `docs/GUIA-VISUAL.md` e na secção
   dono em `docs/brand/moni-cakes-design.md` (DESIGN.md); logo original e landing aprovada em `docs/brand/`.
 - `docs/CHANGELOG.md`: histórico de mudanças (mais recente primeiro).
 - `docs/NOVA-LOJA.md`: este código é um **modelo de loja**; como criar outra loja e o que muda onde.
-- `deploy/PASSO-A-PASSO.md`: pôr a loja online no VPS (`loja3d.kodemi.pt`).
+- `deploy/PASSO-A-PASSO.md`: pôr a loja online no VPS (`monicakes.kodemi.pt`, ao lado da loja3d).
 - `docs/legado-print3d/`: memória, histórico, guia visual e skill da loja-modelo PRINT3D (referência, não descrevem a Moni Cakes).
 - `docs/legado-brindes/`: documentos da loja antiga; não descrevem esta loja.
 
@@ -43,7 +43,7 @@ que a loja faz, `docs/MEMORIA.md` se o dono decidiu algo novo, `docs/GUIA-VISUAL
   `bash deploy/test-migrations.sh` (num computador com Docker, nunca no VPS partilhado). Nada de `BEGIN`/`COMMIT`
   nem `CREATE INDEX CONCURRENTLY`; um valor novo de enum (`ALTER TYPE ... ADD VALUE`) não pode ser usado no mesmo ficheiro.
   Migrations já aplicadas não se editam: a correção vai numa migration nova.
-- **Nunca** mostrar chaves, senhas ou tokens no chat nem em commits. `.env` e `~/loja3d/env` não entram no Git.
+- **Nunca** mostrar chaves, senhas ou tokens no chat nem em commits. `.env` e `~/monicakes/env` não entram no Git.
   Credenciais de pagamento e afins são inseridas pelo utilizador no painel Admin, nunca pelo assistente.
 - Edge Functions (`supabase/functions`): publicadas com o deploy (o `sync.sh` recria o serviço `functions`).
   `verify_jwt` por função em `supabase/config.toml` (router `deploy/functions/main/index.ts`; por omissão exige JWT).
@@ -441,40 +441,43 @@ que a loja faz, `docs/MEMORIA.md` se o dono decidiu algo novo, `docs/GUIA-VISUAL
 
 ## Backend e publicação (VPS)
 
-- `deploy/compose.yaml` (projeto Compose `loja3d`): `db` (supabase/postgres 17), `auth` (GoTrue), `rest` (PostgREST,
-  OpenAPI desligado), `storage` (ficheiros no volume `loja3d_storage-data`), `functions` (edge-runtime), `web`
+- A Moni Cakes corre no mesmo VPS da loja3d, **ao lado** dela (decisão do dono, 5/11/2026): pasta `~/monicakes`,
+  projeto Compose `monicakes`, porta 8191, timers `monicakes-*`, chave de deploy `github-monicakes`, imagem
+  `monicakes-web`. Nunca mexer em `~/loja3d` nem nos contentores do projeto `loja3d`. Passos: `deploy/PASSO-A-PASSO.md`.
+
+- `deploy/compose.yaml` (projeto Compose `monicakes`): `db` (supabase/postgres 17), `auth` (GoTrue), `rest` (PostgREST,
+  OpenAPI desligado), `storage` (ficheiros no volume `monicakes_storage-data`), `functions` (edge-runtime), `web`
   (`Dockerfile`: build Vite + nginx, que também é o gateway `/rest/v1`, `/auth/v1`, `/storage/v1`, `/functions/v1`
-  no mesmo domínio do site) e `migrate` (uso único). Só a porta `127.0.0.1:8190` é publicada.
+  no mesmo domínio do site) e `migrate` (uso único). Só a porta `127.0.0.1:8191` é publicada.
 - O site usa a origem aberta como URL do backend (`src/integrations/supabase/client.ts`); o build só precisa da
   ANON_KEY (`vite.config.ts` recusa a service_role).
-- Segredos gerados no VPS por `deploy/gen-secrets.sh` em `~/loja3d/env` (chmod 600): POSTGRES_PASSWORD, JWT_SECRET,
-  ANON_KEY, SERVICE_ROLE_KEY, CRON_SECRET. `SITE_URL` = endereço público (hoje `https://loja3d.kodemi.pt`).
+- Segredos gerados no VPS por `deploy/gen-secrets.sh` em `~/monicakes/env` (chmod 600): POSTGRES_PASSWORD, JWT_SECRET,
+  ANON_KEY, SERVICE_ROLE_KEY, CRON_SECRET. `SITE_URL` = endereço público (hoje `https://monicakes.kodemi.pt`).
 - Ficheiros enviados são servidos com CSP sandbox (sem XSS no domínio do site). Sem SMTP o registo entra direto
   (autoconfirm); com `SMTP_*` no env passa a pedir confirmação.
 - `deploy/bootstrap.sh` (1.ª vez, corre duas vezes: chave de deploy do GitHub, depois publica);
-  `deploy/sync.sh` + timer `loja3d-sync.timer` publicam cada push no `main` (build, backend, migrate com cópia,
+  `deploy/sync.sh` + timer `monicakes-sync.timer` publicam cada push no `main` (build, backend, migrate com cópia,
   troca do site só se responder; senão volta à versão anterior).
-- Cópias de segurança diárias (`deploy/backup.sh`, timer `loja3d-backup.timer` às 03:30 de Brasília): base (pg_dump -Fc)
+- Cópias de segurança diárias (`deploy/backup.sh`, timer `monicakes-backup.timer` às 03:30 de Brasília): base (pg_dump -Fc)
   e ficheiros enviados (tar.gz do volume, com atributos), verificadas antes de contarem, 7 diárias + 4 semanais em
-  `~/loja3d/backups`; `LOJA3D_BACKUP_REMOTE` opcional (rsync/ssh) para guardar fora do VPS. Restauro:
+  `~/monicakes/backups`; `LOJA3D_BACKUP_REMOTE` opcional (rsync/ssh) para guardar fora do VPS. Restauro:
   `deploy/restore.sh --listar`, `restore.sh <diaria.dump> --ficheiros <ficheiros.tar.gz>` (base e ficheiros do mesmo dia).
-- Domínio (só subdomínios; `kodemi.pt` é o site da empresa e não se toca): `sudo bash deploy/expose-domain.sh loja3d.kodemi.pt` cria só o ficheiro deste subdomínio no nginx do
-  servidor e pede o certificado HTTPS (certbot). Registo DNS: A `loja3d` -> 204.12.203.83.
+- Domínio (só subdomínios; `kodemi.pt` é o site da empresa e não se toca): `sudo bash deploy/expose-domain.sh monicakes.kodemi.pt` cria só o ficheiro deste subdomínio no nginx do
+  servidor e pede o certificado HTTPS (certbot). Registo DNS: A `monicakes` -> 204.12.203.83.
 - Primeiro administrador: `insert into public.user_roles (user_id, role) select id, 'admin' from auth.users
   where email = '<email>' on conflict do nothing;` (psql no contentor db).
-- No VPS partilhado (integranext-vps): só `/home/administrator/loja3d`, sem tocar noutros serviços; no nginx do
-  servidor só o ficheiro da loja (autorizado pelo dono para o subdomínio loja3d.kodemi.pt).
+- No VPS partilhado (integranext-vps): só `/home/administrator/monicakes`, sem tocar noutros serviços; no nginx do
+  servidor só o ficheiro da loja (autorizado pelo dono para o subdomínio monicakes.kodemi.pt).
 
 ## Pendências
 
 - Moni Cakes: fotos reais dos bolos; número de WhatsApp e redes no Admin; textos reais do preparo e da página Sobre;
   categorias do cardápio (o menu padrão `src/lib/catalog.ts`, os textos de `src/i18n/layout.ts` e as fotos de
   `src/lib/media.ts` ainda são da loja 3D até haver categorias no Admin); desligar no Admin os recursos de 3D
-  (Orçamento 3D, personalizador); `deploy/` ainda usa os nomes e o domínio da loja3d (definir domínio e servidor
-  próprios da Moni Cakes antes de publicar).
+  (Orçamento 3D, personalizador). Publicação: `deploy/` pronto para monicakes.kodemi.pt; falta o dono juntar o PR no
+  `main`, criar o registo DNS A `monicakes` e correr `deploy/PASSO-A-PASSO.md` no VPS.
 
-- Loja online em https://loja3d.kodemi.pt desde 5/10/2026 (VPS instalado, HTTPS, primeiro admin). Falta o dono
-  preencher os dados da loja no Admin. O site da empresa em `kodemi.pt` nunca é tocado: só subdomínios.
+- O site da empresa em `kodemi.pt` nunca é tocado: só subdomínios (a loja-modelo PRINT3D está em loja3d.kodemi.pt).
 - E-mails: as funções de e-mail dependiam da Lovable e estão desligadas (`enabled = false`, 503). Falta SMTP e uma
   função de envio própria + cron da fila (pgmq) numa migration nova; esse envio também deve tratar `review_requests_due`.
 - Pagamentos online (Mercado Pago, Stripe, PayPal) feitos pela documentação, ainda sem teste com conta real; a Viva

@@ -13,4 +13,4 @@ Disallow: /pagamento/
 Disallow: /prototipo
 
 # Endereço público da loja (mudar aqui se o domínio mudar). O sitemap é gerado pela função sitemap.
-Sitemap: https://loja3d.kodemi.pt/sitemap.xml
+Sitemap: https://monicakes.kodemi.pt/sitemap.xml

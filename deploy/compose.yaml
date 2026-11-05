@@ -1,13 +1,13 @@
-# Loja 3D: stack completa no VPS, sem nenhum serviço externo da Supabase.
+# Moni Cakes: stack completa no VPS, sem nenhum serviço externo da Supabase.
 # PostgreSQL + auth (GoTrue) + REST (PostgREST) + ficheiros (storage-api) + Edge Functions (edge-runtime),
 # com as mesmas APIs que o supabase-js do site já usa. O nginx do serviço web serve o site e é o gateway
 # (/rest/v1, /auth/v1, /storage/v1, /functions/v1) no mesmo domínio.
 #
-# Variáveis: lidas do ambiente (o sync.sh faz "set -a; . ~/loja3d/env"). Segredos gerados por deploy/gen-secrets.sh.
+# Variáveis: lidas do ambiente (o sync.sh faz "set -a; . ~/monicakes/env"). Segredos gerados por deploy/gen-secrets.sh.
 # Só o serviço web publica porta (127.0.0.1:LOJA3D_HTTP_PORT). Os dados ficam em volumes nomeados do projeto
-# (loja3d_db-data, loja3d_storage-data, loja3d_db-config): atualizar o site nunca os apaga.
+# (monicakes_db-data, monicakes_storage-data, monicakes_db-config): atualizar o site nunca os apaga.
 # Orçamento de memória: cerca de 1,5 GB no total (mem_limit em cada serviço).
-name: loja3d
+name: monicakes
 
 x-base: &base
   restart: unless-stopped
@@ -63,10 +63,10 @@ services:
       GOTRUE_API_HOST: 0.0.0.0
       GOTRUE_API_PORT: "9999"
       # Endereço público do auth (links dos e-mails, emissor dos JWT).
-      API_EXTERNAL_URL: ${SITE_URL:-http://127.0.0.1:8190}/auth/v1
+      API_EXTERNAL_URL: ${SITE_URL:-http://127.0.0.1:8191}/auth/v1
       GOTRUE_DB_DRIVER: postgres
       GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@db:5432/postgres
-      GOTRUE_SITE_URL: ${SITE_URL:-http://127.0.0.1:8190}
+      GOTRUE_SITE_URL: ${SITE_URL:-http://127.0.0.1:8191}
       # Redirecionamentos para o mesmo domínio de SITE_URL já são aceites; outros, separados por vírgula.
       GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS:-}
       # Registo aberto (clientes da loja).
@@ -76,7 +76,7 @@ services:
       GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
       GOTRUE_JWT_EXP: ${JWT_EXPIRY:-3600}
       GOTRUE_JWT_SECRET: ${JWT_SECRET:?Falta JWT_SECRET (corra deploy/gen-secrets.sh)}
-      GOTRUE_JWT_ISSUER: ${SITE_URL:-http://127.0.0.1:8190}/auth/v1
+      GOTRUE_JWT_ISSUER: ${SITE_URL:-http://127.0.0.1:8191}/auth/v1
       GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
       GOTRUE_EXTERNAL_PHONE_ENABLED: "false"
       GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED: "false"
@@ -107,11 +107,11 @@ services:
       GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${GOOGLE_LOGIN_ENABLED:-false}
       GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOTRUE_EXTERNAL_GOOGLE_SECRET: ${GOOGLE_CLIENT_SECRET:-}
-      GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: ${SITE_URL:-http://127.0.0.1:8190}/auth/v1/callback
+      GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: ${SITE_URL:-http://127.0.0.1:8191}/auth/v1/callback
       GOTRUE_EXTERNAL_FACEBOOK_ENABLED: ${FACEBOOK_LOGIN_ENABLED:-false}
       GOTRUE_EXTERNAL_FACEBOOK_CLIENT_ID: ${FACEBOOK_APP_ID:-}
       GOTRUE_EXTERNAL_FACEBOOK_SECRET: ${FACEBOOK_APP_SECRET:-}
-      GOTRUE_EXTERNAL_FACEBOOK_REDIRECT_URI: ${SITE_URL:-http://127.0.0.1:8190}/auth/v1/callback
+      GOTRUE_EXTERNAL_FACEBOOK_REDIRECT_URI: ${SITE_URL:-http://127.0.0.1:8191}/auth/v1/callback
       # Verificação em dois passos (app autenticador) para o Admin.
       GOTRUE_MFA_TOTP_ENROLL_ENABLED: "true"
       GOTRUE_MFA_TOTP_VERIFY_ENABLED: "true"
@@ -170,7 +170,7 @@ services:
       POSTGREST_URL: http://rest:3000
       AUTH_JWT_SECRET: ${JWT_SECRET}
       DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@db:5432/postgres
-      STORAGE_PUBLIC_URL: ${SITE_URL:-http://127.0.0.1:8190}
+      STORAGE_PUBLIC_URL: ${SITE_URL:-http://127.0.0.1:8191}
       REQUEST_ALLOW_X_FORWARDED_PATH: "true"
       # Tamanho máximo de um ficheiro (bytes). O nginx aceita até 60 MB nesta rota.
       FILE_SIZE_LIMIT: ${STORAGE_FILE_SIZE_LIMIT:-52428800}
@@ -206,16 +206,16 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       # As funções falam com a API através do gateway (nginx do web), como no Supabase alojado.
       SUPABASE_URL: http://web:8080
-      SUPABASE_PUBLIC_URL: ${SITE_URL:-http://127.0.0.1:8190}
+      SUPABASE_PUBLIC_URL: ${SITE_URL:-http://127.0.0.1:8191}
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
       SUPABASE_DB_URL: postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
-      SITE_URL: ${SITE_URL:-http://127.0.0.1:8190}
+      SITE_URL: ${SITE_URL:-http://127.0.0.1:8191}
       # Verificação de JWT por omissão; config.toml desliga-a por função (verify_jwt = false).
       VERIFY_JWT: "true"
       FUNCTIONS_PATH: /home/deno/functions
       FUNCTIONS_CONFIG: /home/deno/config.toml
-      # Segredos opcionais das integrações (vazios se não estiverem em ~/loja3d/env).
+      # Segredos opcionais das integrações (vazios se não estiverem em ~/monicakes/env).
       CRON_SECRET: ${CRON_SECRET:-}
       VIVA_WEBHOOK_STRICT_IP: ${VIVA_WEBHOOK_STRICT_IP:-}
       SMTP_HOST: ${SMTP_HOST:-}
@@ -242,7 +242,7 @@ services:
 
   web:
     <<: *base
-    image: loja3d-web:${IMAGE_TAG:-latest}
+    image: monicakes-web:${IMAGE_TAG:-latest}
     build:
       context: ..
       args:
@@ -256,7 +256,7 @@ services:
       - storage
       - functions
     ports:
-      - "127.0.0.1:${LOJA3D_HTTP_PORT:-8190}:8080"
+      - "127.0.0.1:${LOJA3D_HTTP_PORT:-8191}:8080"
     # nginx: uso real abaixo de 10 MB.
     mem_limit: 64m
 

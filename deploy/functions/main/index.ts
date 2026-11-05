@@ -1,4 +1,4 @@
-// Router principal das Edge Functions da Loja 3D (supabase/edge-runtime, serviço "functions" do
+// Router principal das Edge Functions da Moni Cakes (supabase/edge-runtime, serviço "functions" do
 // deploy/compose.yaml). Adaptado do router oficial do self-hosting da Supabase
 // (docker/volumes/functions/main/index.ts), sem nenhum serviço externo.
 //

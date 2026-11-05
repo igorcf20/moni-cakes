@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Gera os segredos que faltarem no ficheiro env da Loja 3D, SEM os mostrar e SEM apagar os existentes.
-#   bash deploy/gen-secrets.sh [ficheiro]      (por omissão ~/loja3d/env)
+# Gera os segredos que faltarem no ficheiro env da Moni Cakes, SEM os mostrar e SEM apagar os existentes.
+#   bash deploy/gen-secrets.sh [ficheiro]      (por omissão ~/monicakes/env)
 #
 # Segredos:
 #   POSTGRES_PASSWORD  palavra-passe da base (letras e números; não mudar depois do 1.º arranque)
@@ -18,11 +18,11 @@
 set -euo pipefail
 umask 077
 
-f=${1:-$HOME/loja3d/env}
-project=${LOJA3D_PROJECT:-loja3d}
+f=${1:-$HOME/monicakes/env}
+project=${LOJA3D_PROJECT:-monicakes}
 mkdir -p "$(dirname "$f")"
 if [ ! -f "$f" ]; then
-  printf '# Loja 3D: variáveis do servidor (chmod 600, nunca no Git). Modelo: deploy/env.example\n' > "$f"
+  printf '# Moni Cakes: variáveis do servidor (chmod 600, nunca no Git). Modelo: deploy/env.example\n' > "$f"
 fi
 chmod 600 "$f"
 

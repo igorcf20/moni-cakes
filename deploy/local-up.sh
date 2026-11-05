@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Sobe a stack completa da Loja 3D NESTE computador, para testes (não é para o VPS: lá usa-se o sync.sh).
+# Sobe a stack completa da Moni Cakes NESTE computador, para testes (não é para o VPS: lá usa-se o sync.sh).
 #   bash deploy/local-up.sh
-# Depois: site e API em http://127.0.0.1:18190 (ou LOJA3D_HTTP_PORT). Parar: bash deploy/local-down.sh
+# Depois: site e API em http://127.0.0.1:18191 (ou LOJA3D_HTTP_PORT). Parar: bash deploy/local-down.sh
 #
 # Variáveis opcionais:
 #   LOJA3D_PROJECT     nome do projeto Compose (loja3d-local); volumes <projeto>_db-data, etc.
-#   LOJA3D_HTTP_PORT   porta local (18190)
+#   LOJA3D_HTTP_PORT   porta local (18191)
 #   LOJA3D_ENV_FILE    ficheiro env de teste, com os segredos gerados por gen-secrets.sh
 #                      (por omissão /tmp/loja3d-local/<projeto>.env; nunca dentro do repositório)
 #   LOJA3D_BACKUP_DIR  cópias de segurança do migrate (ao lado do ficheiro env)
@@ -16,7 +16,7 @@
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
 project=${LOJA3D_PROJECT:-loja3d-local}
-port=${LOJA3D_HTTP_PORT:-18190}
+port=${LOJA3D_HTTP_PORT:-18191}
 envf=${LOJA3D_ENV_FILE:-/tmp/loja3d-local/$project.env}
 case $envf in "$(cd "$here/.." && pwd)"/*) echo "LOJA3D_ENV_FILE não pode ficar dentro do repositório." >&2; exit 1 ;; esac
 

@@ -1,5 +1,5 @@
 [Unit]
-Description=Sincroniza a Loja 3D com o GitHub de 2 em 2 minutos
+Description=Sincroniza a Moni Cakes com o GitHub de 2 em 2 minutos
 
 [Timer]
 OnBootSec=2min

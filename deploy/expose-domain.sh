@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Liga o domínio público à loja (corre UMA vez no VPS, com sudo):
-#   sudo bash ~/loja3d/src/deploy/expose-domain.sh loja3d.kodemi.pt
+#   sudo bash ~/monicakes/src/deploy/expose-domain.sh monicakes.kodemi.pt
 # Só cria o ficheiro deste subdomínio no nginx do servidor; não altera os outros sites.
 # Se o teste do nginx falhar, apaga o ficheiro novo e não recarrega nada.
 set -euo pipefail
-D=${1:?Indique o domínio, ex.: loja3d.kodemi.pt}
-PORT=${LOJA3D_HTTP_PORT:-8190}
+D=${1:?Indique o domínio, ex.: monicakes.kodemi.pt}
+PORT=${LOJA3D_HTTP_PORT:-8191}
 HERE=$(cd "$(dirname "$0")" && pwd)
 [ "$(id -u)" -eq 0 ] || { echo "Corra com sudo."; exit 1; }
 command -v nginx >/dev/null || { echo "nginx não encontrado neste servidor."; exit 1; }
@@ -20,21 +20,21 @@ ip_srv=$(curl -fsS --max-time 5 https://api.ipify.org 2>/dev/null || hostname -I
 curl -fsS -o /dev/null --max-time 5 "http://127.0.0.1:$PORT/healthz" || { echo "A loja não responde em 127.0.0.1:$PORT. Corra primeiro o bootstrap/sync."; exit 1; }
 
 # 3) Nenhum outro site pode já usar este nome
-if grep -rlsE "server_name[^;]*\b${D//./\\.}\b" /etc/nginx | grep -v "loja3d-$D" | grep -q .; then
+if grep -rlsE "server_name[^;]*\b${D//./\\.}\b" /etc/nginx | grep -v "monicakes-$D" | grep -q .; then
   echo "Já existe configuração com server_name $D:"; grep -rlsE "server_name[^;]*\b${D//./\\.}\b" /etc/nginx; exit 1
 fi
 
 # 4) Ficheiro próprio (sites-available/enabled se existir, senão conf.d)
 if [ -d /etc/nginx/sites-available ] && [ -d /etc/nginx/sites-enabled ]; then
-  F=/etc/nginx/sites-available/loja3d-$D; L=/etc/nginx/sites-enabled/loja3d-$D
+  F=/etc/nginx/sites-available/monicakes-$D; L=/etc/nginx/sites-enabled/monicakes-$D
 else
-  F=/etc/nginx/conf.d/loja3d-$D.conf; L=""
+  F=/etc/nginx/conf.d/monicakes-$D.conf; L=""
 fi
 new=0
 if [ ! -f "$F" ]; then
   sed -e "s/__DOMAIN__/$D/g" -e "s/__PORT__/$PORT/g" "$HERE/host-nginx/loja3d.conf.template" > "$F"; new=1
   # IPv6 só se os outros sites do servidor já o usam
-  grep -rqsE "listen +\[::\]" /etc/nginx --exclude="loja3d-$D*" || sed -i '/listen \[::\]/d' "$F"
+  grep -rqsE "listen +\[::\]" /etc/nginx --exclude="monicakes-$D*" || sed -i '/listen \[::\]/d' "$F"
   [ -z "$L" ] || ln -sf "$F" "$L"
 fi
 if ! nginx -t 2>/tmp/loja3d-nginx-test.log; then
@@ -60,4 +60,4 @@ else
   echo "certbot não está instalado: o site abre em http://$D (sem HTTPS). Instale com: sudo apt install certbot python3-certbot-nginx"
 fi
 echo "Pronto: $scheme://$D"
-echo "Agora, como administrator: defina SITE_URL=$scheme://$D em ~/loja3d/env e corra bash ~/loja3d/sync.sh force"
+echo "Agora, como administrator: defina SITE_URL=$scheme://$D em ~/monicakes/env e corra bash ~/monicakes/sync.sh force"

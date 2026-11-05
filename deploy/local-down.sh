@@ -6,9 +6,9 @@
 set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
 project=${LOJA3D_PROJECT:-loja3d-local}
-# O projeto loja3d é a loja real do VPS: este script de testes nunca lhe apaga os dados.
-if [ "$project" = loja3d ] && [ "${1:-}" = --apagar-dados ]; then
-  echo "local-down: recusado. O projeto loja3d é a loja real (volumes loja3d_db-data e loja3d_storage-data)." >&2
+# O projeto monicakes é a loja real do VPS: este script de testes nunca lhe apaga os dados.
+if { [ "$project" = monicakes ] || [ "$project" = loja3d ]; } && [ "${1:-}" = --apagar-dados ]; then
+  echo "local-down: recusado. O projeto $project é uma loja real (volumes monicakes_db-data e monicakes_storage-data)." >&2
   exit 2
 fi
 envf=${LOJA3D_ENV_FILE:-/tmp/loja3d-local/$project.env}
@@ -27,7 +27,7 @@ if [ -n "${LOJA3D_COMPOSE_EXTRA:-}" ]; then
 fi
 docker compose -p "$project" "${compose_files[@]}" --profile tools "${args[@]}"
 if [ "${1:-}" = --apagar-dados ]; then
-  docker image rm -f "loja3d-web:${IMAGE_TAG:-$project}" >/dev/null 2>&1 || true
+  docker image rm -f "monicakes-web:${IMAGE_TAG:-$project}" >/dev/null 2>&1 || true
   echo "Stack $project parada e dados de teste apagados."
 else
   echo "Stack $project parada (dados mantidos nos volumes)."

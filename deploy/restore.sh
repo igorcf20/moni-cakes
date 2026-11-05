@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
-# Restaura a Loja 3D a partir das cópias de segurança: a base de dados (pg_dump -Fc) e/ou os ficheiros enviados
-# (fotos dos produtos, comprovativos de pagamento, modelos 3D; tar.gz do volume loja3d_storage-data).
+# Restaura a Moni Cakes a partir das cópias de segurança: a base de dados (pg_dump -Fc) e/ou os ficheiros enviados
+# (fotos dos produtos, comprovativos de pagamento, modelos 3D; tar.gz do volume monicakes_storage-data).
 # Corre NO VPS, como administrator.
 #
-# Cópias em ~/loja3d/backups (ver: --listar):
+# Cópias em ~/monicakes/backups (ver: --listar):
 #   loja3d-diaria-AAAAMMDD-HHMMSS.dump         base, todos os dias de madrugada (deploy/backup.sh)
 #   loja3d-ficheiros-AAAAMMDD-HHMMSS.tar.gz    ficheiros, na mesma cópia diária (mesma data e hora no nome)
 #   loja3d-AAAAMMDD-HHMMSS.dump                base, antes de cada migration nova (deploy/migrate.sh)
 #   loja3d-antes-do-restauro-*.dump, loja3d-ficheiros-antes-do-restauro-*.tar.gz   estado antes de um restauro
 #
-#   bash ~/loja3d/src/deploy/restore.sh --listar                              mostra as cópias disponíveis
-#   bash ~/loja3d/src/deploy/restore.sh <cópia.dump>                          restaura a base de dados
-#   bash ~/loja3d/src/deploy/restore.sh --ficheiros <cópia.tar.gz>            restaura os ficheiros enviados
+#   bash ~/monicakes/src/deploy/restore.sh --listar                              mostra as cópias disponíveis
+#   bash ~/monicakes/src/deploy/restore.sh <cópia.dump>                          restaura a base de dados
+#   bash ~/monicakes/src/deploy/restore.sh --ficheiros <cópia.tar.gz>            restaura os ficheiros enviados
 #   ... --sim                                                                 sem pergunta (para scripts)
 #
 # RESTAURAR TUDO como estava num dia (base + ficheiros da mesma cópia diária), num só comando:
-#   bash ~/loja3d/src/deploy/restore.sh --listar
-#   bash ~/loja3d/src/deploy/restore.sh ~/loja3d/backups/loja3d-diaria-AAAAMMDD-HHMMSS.dump \
-#        --ficheiros ~/loja3d/backups/loja3d-ficheiros-AAAAMMDD-HHMMSS.tar.gz
+#   bash ~/monicakes/src/deploy/restore.sh --listar
+#   bash ~/monicakes/src/deploy/restore.sh ~/monicakes/backups/loja3d-diaria-AAAAMMDD-HHMMSS.dump \
+#        --ficheiros ~/monicakes/backups/loja3d-ficheiros-AAAAMMDD-HHMMSS.tar.gz
 # Primeiro a base, depois os ficheiros (também se pode fazer em dois comandos, por esta ordem). Use as duas
 # cópias com a MESMA data e hora: só restaurar uma delas pode deixar fotos sem produto ou produtos sem foto.
 #
@@ -43,15 +43,15 @@
 # Os contentores auxiliares usam a imagem das funções, que já existe no servidor (nada é descarregado), sem rede.
 # Os dados nunca são apagados por este script além do que a própria cópia substitui.
 #
-# Variáveis opcionais: LOJA3D_PROJECT (loja3d), LOJA3D_ENV_FILE (~/loja3d/env),
-# LOJA3D_BACKUP_DIR (~/loja3d/backups), LOJA3D_COMPOSE_EXTRA (ficheiros Compose extra separados por ":",
+# Variáveis opcionais: LOJA3D_PROJECT (loja3d), LOJA3D_ENV_FILE (~/monicakes/env),
+# LOJA3D_BACKUP_DIR (~/monicakes/backups), LOJA3D_COMPOSE_EXTRA (ficheiros Compose extra separados por ":",
 # só para testes).
 set -euo pipefail
 # Cópias e registos só para este utilizador (têm dados pessoais: contas, pedidos, comprovativos).
 umask 077
 here=$(cd "$(dirname "$0")" && pwd)
-project=${LOJA3D_PROJECT:-loja3d}
-envf=${LOJA3D_ENV_FILE:-$HOME/loja3d/env}
+project=${LOJA3D_PROJECT:-monicakes}
+envf=${LOJA3D_ENV_FILE:-$HOME/monicakes/env}
 
 say() { echo "restore: $*"; }
 die() { echo "restore: ERRO: $*" >&2; exit 1; }
@@ -74,7 +74,7 @@ while [ $# -gt 0 ]; do
   shift
 done
 
-# Pasta das cópias: a do ambiente, senão a do ficheiro env, senão ~/loja3d/backups.
+# Pasta das cópias: a do ambiente, senão a do ficheiro env, senão ~/monicakes/backups.
 backups=${LOJA3D_BACKUP_DIR:-}
 if [ -z "$backups" ] && [ -f "$envf" ]; then
   # shellcheck disable=SC1090
@@ -117,7 +117,7 @@ set -a
 # shellcheck disable=SC1090
 . "$envf"
 set +a
-port=${LOJA3D_HTTP_PORT:-8190}
+port=${LOJA3D_HTTP_PORT:-8191}
 
 compose_files=(-f "$here/compose.yaml")
 if [ -n "${LOJA3D_COMPOSE_EXTRA:-}" ]; then
@@ -147,7 +147,7 @@ cleanup() {
   # Nunca deixar a loja (ou só o storage) parada por causa de um erro ou de uma interrupção deste script.
   if [ "$all_stopped" = 1 ]; then
     echo "restore: o restauro da base foi interrompido; a voltar a ligar os serviços. A base fica toda restaurada ou como" >&8
-    echo "restore: estava (uma só transação). Para a pôr em dia com o código (migrate e Vault): bash ~/loja3d/sync.sh force" >&8
+    echo "restore: estava (uma só transação). Para a pôr em dia com o código (migrate e Vault): bash ~/monicakes/sync.sh force" >&8
     start_all
   elif [ "$storage_stopped" = 1 ]; then
     compose start storage >/dev/null 2>&1 || true
@@ -168,13 +168,13 @@ helper_image() {
 # Contentores descartáveis sobre o volume dos ficheiros: sem rede, sem registo, só as capacidades precisas.
 run_ro() {
   docker run --rm --pull never --network none --log-driver none --security-opt no-new-privileges:true \
-    --cap-drop ALL --cap-add DAC_READ_SEARCH --label loja3d.restore=ficheiros \
+    --cap-drop ALL --cap-add DAC_READ_SEARCH --label monicakes.restore=ficheiros \
     -v "$vol:/dados:ro" --entrypoint sh "$img" -c 'exec nice -n 10 "$@"' sh "$@"
 }
 run_rw() {
   docker run --rm -i --pull never --network none --log-driver none --security-opt no-new-privileges:true \
     --cap-drop ALL --cap-add CHOWN --cap-add DAC_OVERRIDE --cap-add FOWNER --cap-add FSETID \
-    --label loja3d.restore=ficheiros -v "$vol:/dados" --entrypoint sh "$img" -c "$@"
+    --label monicakes.restore=ficheiros -v "$vol:/dados" --entrypoint sh "$img" -c "$@"
 }
 tar_volume() { # tar_volume <destino.part>: arquivo do volume, como o backup.sh (um ficheiro ilegível faz falhar)
   run_ro tar --create --gzip --file=- --directory=/dados --numeric-owner --xattrs --xattrs-include='user.*' \

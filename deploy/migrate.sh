@@ -1,5 +1,5 @@
 #!/bin/sh
-# Loja 3D: aplica as migrations de supabase/migrations no PostgreSQL próprio (VPS).
+# Moni Cakes: aplica as migrations de supabase/migrations no PostgreSQL próprio (VPS).
 #
 # - Aplica os ficheiros *.sql por ordem de nome, cada um numa transação
 #   (psql --single-transaction -v ON_ERROR_STOP=1): ou entra o ficheiro todo, ou nada.
@@ -340,6 +340,6 @@ log "concluído: $count migration(s) aplicada(s)."
 
 # Restaurar uma cópia: deploy/restore.sh (cópia do estado atual antes, restauro numa só transação,
 # serviços parados e religados, migrate no fim). No VPS:
-#   bash ~/loja3d/src/deploy/restore.sh --listar
-#   bash ~/loja3d/src/deploy/restore.sh ~/loja3d/backups/loja3d-AAAAMMDD-HHMMSS.dump
+#   bash ~/monicakes/src/deploy/restore.sh --listar
+#   bash ~/monicakes/src/deploy/restore.sh ~/monicakes/backups/loja3d-AAAAMMDD-HHMMSS.dump
 # (o migrate volta a gravar no Vault os segredos dos cron jobs, se a chave do pgsodium for outra).

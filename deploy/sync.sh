@@ -1,29 +1,29 @@
 #!/usr/bin/env bash
 # Corre NO VPS (timer de 2 em 2 min). Se a main do GitHub tem commit novo:
-#   1. gera os segredos que faltarem em ~/loja3d/env (deploy/gen-secrets.sh; nunca os mostra);
+#   1. gera os segredos que faltarem em ~/monicakes/env (deploy/gen-secrets.sh; nunca os mostra);
 #   2. constrói a imagem nova do site (o site atual continua no ar);
-#   3. põe o código novo em ~/loja3d/src e sobe db, auth, rest, storage e functions
-#      (os dados ficam nos volumes loja3d_db-data e loja3d_storage-data: nunca são apagados);
+#   3. põe o código novo em ~/monicakes/src e sobe db, auth, rest, storage e functions
+#      (os dados ficam nos volumes monicakes_db-data e monicakes_storage-data: nunca são apagados);
 #   4. corre o migrate: cópia de segurança + migrations pendentes. Se falhar, o site antigo fica;
 #   5. troca o contentor do site e confirma que o site, o login e a API respondem.
 # Se algum passo falhar, volta à versão anterior e não repete esse commit.
-#   bash ~/loja3d/sync.sh         só se houver commit novo
-#   bash ~/loja3d/sync.sh force   reconstrói mesmo sem commit novo (ex.: depois de mudar ~/loja3d/env)
-# Em cada execução liga também o timer da cópia diária (loja3d-backup.timer) se ainda não estiver ligado
-# (LOJA3D_BACKUP_TIMER=off em ~/loja3d/env deixa-o como estiver). O sync.lock é partilhado com o backup.sh e o
+#   bash ~/monicakes/sync.sh         só se houver commit novo
+#   bash ~/monicakes/sync.sh force   reconstrói mesmo sem commit novo (ex.: depois de mudar ~/monicakes/env)
+# Em cada execução liga também o timer da cópia diária (monicakes-backup.timer) se ainda não estiver ligado
+# (LOJA3D_BACKUP_TIMER=off em ~/monicakes/env deixa-o como estiver). O sync.lock é partilhado com o backup.sh e o
 # restore.sh: enquanto um deles corre, o sync.sh sai sem fazer nada e tenta outra vez na vez seguinte.
 set -euo pipefail
-R=$HOME/loja3d
-REPO=${LOJA3D_REPO:-git@github-loja3d:igorcf20/loja3d.git}
-# Nome do projeto Compose (volumes loja3d_db-data, etc.). Só se muda para testes.
-PROJECT=${LOJA3D_PROJECT:-loja3d}
+R=$HOME/monicakes
+REPO=${LOJA3D_REPO:-git@github-monicakes:igorcf20/moni-cakes.git}
+# Nome do projeto Compose (volumes monicakes_db-data, etc.). Só se muda para testes.
+PROJECT=${LOJA3D_PROJECT:-monicakes}
 mkdir -p "$R"
 exec 9>"$R/sync.lock"; flock -n 9 || exit 0
 
 # Timer da cópia diária: liga-o (enable --now) se ainda não estiver ligado, sem reiniciar mais nada. Corre também
 # sem commit novo, para apanhar o primeiro deploy que trouxe a unidade (feito ainda pelo sync.sh anterior).
 backup_timer() {
-  local u=loja3d-backup.timer off
+  local u=monicakes-backup.timer off
   [ -f "$HOME/.config/systemd/user/$u" ] && [ -f "$R/src/deploy/backup.sh" ] || return 0
   command -v systemctl >/dev/null 2>&1 || return 0
   off=$(sed -n 's/^[[:space:]]*LOJA3D_BACKUP_TIMER=//p' "$R/env" 2>/dev/null | tail -n 1 | tr -d "\"' ")
@@ -103,7 +103,7 @@ git -C "$R/repo" archive main | tar -x -C "$new"
 # Segredos que faltarem (nunca impressos) e variáveis do servidor.
 LOJA3D_PROJECT=$PROJECT bash "$new/deploy/gen-secrets.sh" "$R/env"
 set -a; . "$R/env"; set +a
-port=${LOJA3D_HTTP_PORT:-8190}
+port=${LOJA3D_HTTP_PORT:-8191}
 export LOJA3D_BACKUP_DIR=${LOJA3D_BACKUP_DIR:-$R/backups}
 mkdir -p "$LOJA3D_BACKUP_DIR"; chmod 700 "$LOJA3D_BACKUP_DIR"
 LOJA3D_UID=$(id -u); LOJA3D_GID=$(id -g); export LOJA3D_UID LOJA3D_GID
@@ -145,5 +145,5 @@ cp "$R/src/deploy/sync.sh" "$R/sync.sh.new" && mv "$R/sync.sh.new" "$R/sync.sh"
 rm -rf "$R/src.prev" "$R/src.failed"
 echo "$sha" > "$R/current-sha"; rm -f "$R/failed-sha"
 # guarda as 3 imagens mais recentes do site para poder voltar atrás (docker image ls lista da mais nova para a mais antiga)
-docker image ls loja3d-web --format '{{.Tag}}' | grep -E '^[0-9a-f]{12}$' | tail -n +4 | xargs -r -I{} docker image rm -f "loja3d-web:{}" >/dev/null || true
+docker image ls monicakes-web --format '{{.Tag}}' | grep -E '^[0-9a-f]{12}$' | tail -n +4 | xargs -r -I{} docker image rm -f "monicakes-web:{}" >/dev/null || true
 echo "SYNC OK ${sha:0:7}"

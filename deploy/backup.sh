@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Loja 3D: cópia de segurança DIÁRIA da base de dados e dos ficheiros enviados. Corre NO VPS, como
-# administrator, pelo timer systemd de utilizador loja3d-backup.timer (de madrugada) ou à mão:
-#   bash ~/loja3d/src/deploy/backup.sh
-#   systemctl --user start loja3d-backup.service     (o mesmo pelo systemd; registo: journalctl --user -u loja3d-backup)
+# Moni Cakes: cópia de segurança DIÁRIA da base de dados e dos ficheiros enviados. Corre NO VPS, como
+# administrator, pelo timer systemd de utilizador monicakes-backup.timer (de madrugada) ou à mão:
+#   bash ~/monicakes/src/deploy/backup.sh
+#   systemctl --user start monicakes-backup.service     (o mesmo pelo systemd; registo: journalctl --user -u monicakes-backup)
 #
 # O que faz, por ordem:
-#   1. espera pelo bloqueio ~/loja3d/sync.lock (o mesmo do sync.sh e do restore.sh): nunca corre a meio de um
+#   1. espera pelo bloqueio ~/monicakes/sync.lock (o mesmo do sync.sh e do restore.sh): nunca corre a meio de um
 #      deploy ou de um restauro, e o sync.sh espera pela vez seguinte enquanto esta cópia corre;
 #   2. confirma o espaço livre na pasta das cópias: abaixo de LOJA3D_BACKUP_MIN_FREE_MB não começa (e não deixa
 #      o disco da base de dados encher a meio de uma cópia);
@@ -32,12 +32,12 @@
 #
 # Restaurar: deploy/restore.sh (--listar; <cópia.dump>; --ficheiros <cópia.tar.gz>; ver o topo desse script).
 #
-# Variáveis (em ~/loja3d/env; as definidas no ambiente ao chamar o script ganham às do ficheiro):
-#   LOJA3D_BACKUP_DIR (~/loja3d/backups)      LOJA3D_BACKUP_MIN_FREE_MB (2048)
+# Variáveis (em ~/monicakes/env; as definidas no ambiente ao chamar o script ganham às do ficheiro):
+#   LOJA3D_BACKUP_DIR (~/monicakes/backups)      LOJA3D_BACKUP_MIN_FREE_MB (2048)
 #   LOJA3D_BACKUP_KEEP_DAILY (7)              LOJA3D_BACKUP_KEEP_WEEKLY (4)
 #   LOJA3D_BACKUP_REMOTE (vazio = as cópias ficam só neste VPS)
 #   LOJA3D_BACKUP_LOCK_WAIT (2700)            segundos de espera pelo bloqueio (um deploy demora até ~40 min)
-#   Só para testes: LOJA3D_PROJECT (loja3d), LOJA3D_ENV_FILE (~/loja3d/env), LOJA3D_COMPOSE_EXTRA.
+#   Só para testes: LOJA3D_PROJECT (loja3d), LOJA3D_ENV_FILE (~/monicakes/env), LOJA3D_COMPOSE_EXTRA.
 set -euo pipefail
 umask 077
 export LC_ALL=C
@@ -53,8 +53,8 @@ case "${1:-}" in
 esac
 
 here=$(cd "$(dirname "$0")" && pwd)
-project=${LOJA3D_PROJECT:-loja3d}
-envf=${LOJA3D_ENV_FILE:-$HOME/loja3d/env}
+project=${LOJA3D_PROJECT:-monicakes}
+envf=${LOJA3D_ENV_FILE:-$HOME/monicakes/env}
 [ -f "$envf" ] || die "falta o ficheiro de variáveis $envf"
 for c in docker flock tar df awk date; do command -v "$c" >/dev/null 2>&1 || die "falta o comando $c."; done
 
@@ -68,7 +68,7 @@ set +a
 eval "$keep_env"
 
 backups=${LOJA3D_BACKUP_DIR:-$(dirname "$envf")/backups}
-# Caminho absoluto: o Compose leria um relativo a partir de deploy/ (dentro de ~/loja3d/src, substituído em cada deploy).
+# Caminho absoluto: o Compose leria um relativo a partir de deploy/ (dentro de ~/monicakes/src, substituído em cada deploy).
 case $backups in /*) ;; *) die "LOJA3D_BACKUP_DIR tem de ser um caminho absoluto (ver deploy/env.example)." ;; esac
 remote=${LOJA3D_BACKUP_REMOTE:-}
 # Destino remoto: validado já (antes de qualquer cópia); um valor inválido não impede as cópias locais, mas o
@@ -145,7 +145,7 @@ dump_name="loja3d-diaria-$stamp.dump"
 files_name="loja3d-ficheiros-$stamp.tar.gz"
 failures=() new_files=() removed=()
 dump_info="" files_info=""
-part="" run_label="loja3d.backup.run=$$-$stamp"
+part="" run_label="monicakes.backup.run=$$-$stamp"
 on_exit() {
   [ -z "$part" ] || rm -f "$part" "$part.err" "$part.lst"
   # Contentor auxiliar ainda a ler o volume (ex.: o systemd parou o serviço a meio): parado já, sem ficar órfão.
@@ -215,7 +215,7 @@ helper_image() {
 vol="" img=""
 run_ro() {
   docker run --rm --pull never --network none --log-driver none --security-opt no-new-privileges:true \
-    --cap-drop ALL --cap-add DAC_READ_SEARCH --label loja3d.backup=ficheiros --label "$run_label" \
+    --cap-drop ALL --cap-add DAC_READ_SEARCH --label monicakes.backup=ficheiros --label "$run_label" \
     -v "$vol:/dados:ro" --entrypoint sh "$img" -c \
     'if ionice -c 2 -n 7 true 2>/dev/null; then exec ionice -c 2 -n 7 nice -n 19 "$@"; else exec nice -n 19 "$@"; fi' sh "$@"
 }

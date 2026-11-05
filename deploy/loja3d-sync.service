@@ -1,8 +1,0 @@
-[Unit]
-Description=Sincroniza a Loja 3D com o GitHub (main)
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/env bash %h/loja3d/sync.sh
-TimeoutStartSec=40min
-Nice=19

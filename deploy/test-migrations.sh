@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Testa as migrations NESTE computador (de desenvolvimento, não no VPS partilhado), numa base
 # descartável igual à do VPS (deploy/compose.yaml: db + auth + rest + storage + migrate).
-# Não toca na stack real (projeto loja3d) nem nos seus volumes; não publica portas.
+# Não toca na stack real (projeto monicakes) nem nos seus volumes; não publica portas.
 #   bash deploy/test-migrations.sh
 #
 # O que verifica:
@@ -18,7 +18,7 @@ set -euo pipefail
 here=$(cd "$(dirname "$0")" && pwd)
 repo=$(cd "$here/.." && pwd)
 project=${LOJA3D_PROJECT:-loja3d-migtest}
-case $project in loja3d) echo "test-migrations: use um projeto de teste, nunca o loja3d." >&2; exit 2 ;; esac
+case $project in loja3d|monicakes) echo "test-migrations: use um projeto de teste, nunca a loja real (monicakes)." >&2; exit 2 ;; esac
 
 work=$(mktemp -d "${TMPDIR:-/tmp}/loja3d-migtest.XXXXXX")
 chmod 700 "$work"
@@ -155,7 +155,7 @@ SQL
 check "sem dados da loja antiga (linhas encontradas: $old)" "$([ "$old" = "0" ] && echo 1 || echo 0)"
 
 nome=$(psql_db -c "select value->>'name' from public.store_settings where key = 'store_info'")
-check "store_settings.store_info com o nome PRINT3D" "$([ "$nome" = "PRINT3D" ] && echo 1 || echo 0)"
+check "store_settings.store_info com o nome Moni Cakes" "$([ "$nome" = "Moni Cakes" ] && echo 1 || echo 0)"
 
 copias=$(find "$LOJA3D_BACKUP_DIR" -name 'loja3d-*.dump' | wc -l | tr -d ' ')
 check "cópia de segurança feita antes de aplicar ($copias)" "$([ "$copias" -ge 1 ] && echo 1 || echo 0)"
