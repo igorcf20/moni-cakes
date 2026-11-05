@@ -16,7 +16,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { motion, MotionConfig } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { AlertCircle, ArrowRight, Box, ChevronRight, Clock, FileDown, Heart, Info, Leaf, PackageSearch, Printer, RefreshCw, Repeat, RotateCcw, ShieldCheck, ShoppingBag, Truck } from 'lucide-react';
+import { AlertCircle, ArrowRight, Box, ChefHat, ChevronRight, Clock, FileDown, Heart, Info, Leaf, PackageSearch, RefreshCw, Repeat, RotateCcw, ShieldCheck, ShoppingBag, Truck } from 'lucide-react';
 import { MoniHeader } from '@/components/moni/MoniHeader';
 import { MoniCakeOrder } from '@/components/moni/MoniCakeOrder';
 import { useMoniOrder } from '@/components/moni/useMoniOrder';
@@ -393,7 +393,7 @@ function ProductView({ product, options, optionsLoading, optionsError }: {
     ...(material && pp.trust.style === 'list' ? [{ key: 'material', Icon: Leaf, title: t('madeIn', { material }) }] : []),
     ...(showDates
       ? [{ key: 'lead', Icon: Clock, title: leadText(tdd, lead) }]
-      : productionText ? [{ key: 'production', Icon: Printer, title: tp('trustProduction'), text: t('production', { time: productionText }) }] : []),
+      : productionText ? [{ key: 'production', Icon: ChefHat, title: tp('trustProduction'), text: t('production', { time: productionText }) }] : []),
     { key: 'shipping', Icon: Truck, title: tp('trustShipping'), text: showDates ? tp('trustShipsBy', { date: formatDay(shipsBy!, locale) }) : tp('trustShippingText') },
     ...(showReturns ? [{ key: 'returns', Icon: RotateCcw, title: tp('trustReturns', { days: returnSettings!.days }), text: tp('trustReturnsText') }] : []),
     { key: 'secure', Icon: ShieldCheck, title: t('securePurchase'), text: tp('trustSecureText') },

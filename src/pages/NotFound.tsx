@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, HelpCircle, House, MessageSquareText, PackageSearch, Search, SearchX, ShoppingBag, Upload, Wand2, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, ArrowRight, HelpCircle, House, MessageSquareText, PackageSearch, Search, SearchX, ShoppingBag, Wand2, type LucideIcon } from 'lucide-react';
 import { LayerArt } from '@/components/MediaImage';
 import { PageShell } from '@/components/institutional/ui';
 import { appear, btnPrimary, btnSecondary, card, eyebrow, h1 } from '@/components/institutional/styles';
@@ -18,8 +18,7 @@ import { cn } from '@/lib/utils';
 
 type NK = keyof typeof notFoundMessages['pt-BR'];
 const LINKS: [LucideIcon, NK, string][] = [
-  [Wand2, 'linkCustom', '/personalizar'],
-  [Upload, 'linkQuote', '/orcamento-3d'],
+  [Wand2, 'linkCustom', '/categoria/bolos-personalizados'],
   [HelpCircle, 'linkFaq', '/faq'],
   [PackageSearch, 'linkTrack', '/rastrear'],
   [MessageSquareText, 'linkContact', '/contatos'],

@@ -16,7 +16,7 @@ import { Helmet } from "react-helmet";
 import { toast } from "sonner";
 import {
   AlertCircle, ArrowRight, Box, Check, CheckCircle2, Clock, Copy, CreditCard, Landmark, Loader2, MapPin, PackageSearch,
-  Printer, QrCode, RefreshCw, ShoppingBag, Smartphone, Store, Truck, UploadCloud, Wallet, type LucideIcon,
+  ChefHat, QrCode, RefreshCw, ShoppingBag, Smartphone, Store, Truck, UploadCloud, Wallet, type LucideIcon,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
@@ -971,7 +971,7 @@ const OrderSuccess = () => {
 
   const steps: Array<{ Icon: LucideIcon; title: string; text: string; done?: boolean; link?: ReactNode }> = [
     { Icon: isPaid ? CheckCircle2 : CreditCard, title: isPaid ? t("okPaidTitle") : t("okStepPayTitle"), text: isPaid ? t("okStepPaid") : t("okStepPay"), done: isPaid },
-    { Icon: Printer, title: t("okStepMakeTitle"), text: t("okStepMake") },
+    { Icon: ChefHat, title: t("okStepMakeTitle"), text: t("okStepMake") },
     isPickup
       ? { Icon: Store, title: t("okStepPickupTitle"), text: t("okStepPickup") }
       : {

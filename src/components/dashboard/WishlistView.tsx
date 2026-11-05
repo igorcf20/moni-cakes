@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { CartStockError } from "@/hooks/useCart";
-import FeatureLink from "@/components/FeatureLink";
 import { Link } from "react-router-dom";
 import { ChevronDown, Heart, RefreshCw, WifiOff } from "lucide-react";
 import { toast } from "sonner";
@@ -62,7 +61,7 @@ export function FavoritesGrid({ userId, wide = false }: { userId: string; wide?:
     return (
       <EmptyState Icon={Heart} title={t("favEmptyTitle")} text={t("favEmptyText")}>
         <Link to="/produtos" className={btnPrimary}>{t("exploreProducts")}</Link>
-        <FeatureLink to="/personalizar" className={btnSecondary}>{t("favCreate")}</FeatureLink>
+        <Link to="/categoria/bolos-personalizados" className={btnSecondary}>{t("favCreate")}</Link>
       </EmptyState>
     );
   }
