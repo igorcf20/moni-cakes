@@ -4,6 +4,7 @@ A loja Moni Cakes (repositório `igorcf20/moni-cakes`) nasceu como cópia sem hi
 (`igorcf20/loja3d`, estado de 5/11/2026). O histórico da loja-modelo está em `docs/legado-print3d/CHANGELOG.md`.
 Mais recente primeiro.
 
+- 2026-11-05: Cardápio de bolos no lugar das categorias da loja 3D (menu, mega menu, filtros, textos das listagens e ideias do catálogo vazio, 4 idiomas); orçamento 3D e personalizador desligados por padrão. Celular: o hero acompanha a rolagem (título sobe, bolo aproxima-se, pétalas e luz) e os cartões de Nossos Bolos entram um a um.
 - 2026-11-05: Loja publicada em https://monicakes.kodemi.pt (VPS 62.129.141.82, ao lado da loja3d). Migration `20261105230000_moni_cakes_nome.sql`: nome da loja, título das páginas e modelos de e-mail deixam de dizer PRINT3D (só onde o texto ainda era o herdado).
 - 2026-11-05: VPS novo: 62.129.141.82 (guia de publicação, DNS e documentação).
 - 2026-11-05: Publicação adaptada para `monicakes.kodemi.pt` ao lado da loja3d no mesmo VPS (pasta `~/monicakes`, projeto `monicakes`, porta 8191, timers `monicakes-sync`/`monicakes-backup`, chave de deploy própria, guia `deploy/PASSO-A-PASSO.md`); `robots.txt` aponta para o novo domínio.
