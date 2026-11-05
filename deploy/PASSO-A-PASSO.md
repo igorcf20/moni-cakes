@@ -1,6 +1,6 @@
 # Pôr a Moni Cakes online em monicakes.kodemi.pt
 
-Tudo corre no VPS `integranext-vps` (204.12.203.83), como `administrator`, só em `~/monicakes` e na porta local 8191.
+Tudo corre no VPS 62.129.141.82, como `administrator`, só em `~/monicakes` e na porta local 8191.
 Os outros sites do servidor não mudam. Nenhuma chave ou senha aparece no ecrã: são geradas e guardadas no VPS.
 
 A Moni Cakes fica **ao lado** da loja3d (que continua em `~/loja3d`, porta 8190, e não muda): pasta, projeto Docker
@@ -12,7 +12,7 @@ todos próprios. As imagens Docker do backend são as mesmas da loja3d, por isso
 Abra o **PowerShell** (menu Iniciar > escreva PowerShell) e escreva:
 
 ```sh
-ssh administrator@204.12.203.83
+ssh administrator@62.129.141.82
 ```
 
 Na primeira vez responda `yes` e escreva a senha do servidor (não aparece enquanto escreve). Os comandos dos passos
@@ -20,7 +20,7 @@ abaixo são colados nessa janela (clique com o botão direito para colar). Para 
 
 ## 0. Uma vez, antes de começar
 
-- DNS do domínio kodemi.pt (painel onde gere o domínio): registo **A**, nome **monicakes**, valor **204.12.203.83**.
+- DNS do domínio kodemi.pt (painel onde gere o domínio): registo **A**, nome **monicakes**, valor **62.129.141.82**.
 - O site publica o ramo `main` do repositório `igorcf20/moni-cakes`: junte antes o pull request da loja no `main`.
 - No VPS: o utilizador `administrator` usa o Docker (`docker info` funciona), há uns 3 GB livres em disco e pelo menos
   2 GB de memória disponível **além** da loja3d (`free -m`, coluna available): cada loja usa até ~1,5 GB.

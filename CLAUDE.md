@@ -463,10 +463,10 @@ que a loja faz, `docs/MEMORIA.md` se o dono decidiu algo novo, `docs/GUIA-VISUAL
   `~/monicakes/backups`; `LOJA3D_BACKUP_REMOTE` opcional (rsync/ssh) para guardar fora do VPS. Restauro:
   `deploy/restore.sh --listar`, `restore.sh <diaria.dump> --ficheiros <ficheiros.tar.gz>` (base e ficheiros do mesmo dia).
 - Domínio (só subdomínios; `kodemi.pt` é o site da empresa e não se toca): `sudo bash deploy/expose-domain.sh monicakes.kodemi.pt` cria só o ficheiro deste subdomínio no nginx do
-  servidor e pede o certificado HTTPS (certbot). Registo DNS: A `monicakes` -> 204.12.203.83.
+  servidor e pede o certificado HTTPS (certbot). Registo DNS: A `monicakes` -> 62.129.141.82.
 - Primeiro administrador: `insert into public.user_roles (user_id, role) select id, 'admin' from auth.users
   where email = '<email>' on conflict do nothing;` (psql no contentor db).
-- No VPS partilhado (integranext-vps): só `/home/administrator/monicakes`, sem tocar noutros serviços; no nginx do
+- No VPS partilhado (62.129.141.82): só `/home/administrator/monicakes`, sem tocar noutros serviços; no nginx do
   servidor só o ficheiro da loja (autorizado pelo dono para o subdomínio monicakes.kodemi.pt).
 
 ## Pendências

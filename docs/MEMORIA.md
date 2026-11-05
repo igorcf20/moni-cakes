@@ -14,14 +14,14 @@ com as preferências gerais do dono, ficou em `docs/legado-print3d/MEMORIA.md`.
 - Nada de produtos ou preços inventados como conteúdo definitivo: o hero usa exemplos visuais marcados como
   "Imagem ilustrativa" e Nossos Bolos mostra o catálogo real do Admin (sem produtos, cartões "Em breve" sem preço).
 - 5/11/2026: a loja real fica em `monicakes.kodemi.pt`, no mesmo VPS da loja3d, **ao lado** dela (pasta
-  `~/monicakes`, projeto Compose `monicakes`, porta 8191, timers `monicakes-*`). Nunca mexer na loja3d nem em `kodemi.pt`.
+  `~/monicakes`, projeto Compose `monicakes`, porta 8191, timers `monicakes-*`). Nunca mexer na loja3d nem em `kodemi.pt`. O VPS passou a ser 62.129.141.82 (aviso do dono, 5/11/2026).
 
 ## Em aberto (perguntar ao dono quando for a hora)
 
 - Fotografias reais dos bolos (com fundo transparente) para substituir as imagens provisórias.
 - Canal de encomendas: número de WhatsApp (Admin) e Instagram.
 - Textos reais sobre o preparo (seção O Sabor em Cada Detalhe) e a página Sobre.
-- Publicação: o dono junta o PR no `main`, cria o registo DNS A `monicakes` -> 204.12.203.83 e segue `deploy/PASSO-A-PASSO.md`.
+- Publicação: o dono junta o PR no `main`, cria o registo DNS A `monicakes` -> 62.129.141.82 e segue `deploy/PASSO-A-PASSO.md`.
 - Categorias do cardápio (o menu padrão do código ainda é o da loja 3D até haver categorias no Admin).
 
 ## Linha do tempo
