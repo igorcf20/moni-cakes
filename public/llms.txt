@@ -1,0 +1,7 @@
+# Moni Cakes
+
+Moni Cakes é um café e confeitaria com loja online de bolos artesanais, recheados e personalizados sob encomenda.
+
+- Bolos e catálogo: /produtos
+- Encomendas e contato: /contatos
+- Sobre a confeitaria: /sobre

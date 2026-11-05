@@ -1,0 +1,2 @@
+ALTER TABLE public.product_variations ADD COLUMN IF NOT EXISTS price_modifier numeric NOT NULL DEFAULT 0;
+COMMENT ON COLUMN public.product_variations.price_modifier IS 'Amount to add (or subtract) from the base product price when this variation is selected. Use negative values for discounts.';

@@ -1,0 +1,14 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import ts from "typescript";
+const code = ts.transpileModule(readFileSync(new URL("../src/lib/sizePresetValidation.ts", import.meta.url), "utf8"), { compilerOptions: { module: ts.ModuleKind.ES2022, target: ts.ScriptTarget.ES2022 } }).outputText;
+const { sizePresetPayload } = await import("data:text/javascript;base64," + Buffer.from(code).toString("base64"));
+const item = (label, price = 0) => ({ label, defaultPriceAdjustment: price, displayOrder: 88, draftKey: "ui-only" });
+assert.deepEqual(sizePresetPayload(" Adulto ", [item(" M ", 1.5), item("L", 0)]), { name: "Adulto", sizes: ["M", "L"], items: [{ label: "M", defaultPriceAdjustment: 1.5, displayOrder: 0 }, { label: "L", defaultPriceAdjustment: 0, displayOrder: 1 }] });
+assert.throws(() => sizePresetPayload(" ", []), /^Error: preset_name$/);
+assert.throws(() => sizePresetPayload("Teste", [item(" ")]), /^Error: size_name$/);
+assert.throws(() => sizePresetPayload("Teste", [item("M"), item(" m ")]), /^Error: size_duplicate$/);
+for (const price of [-1, NaN, Infinity, 1.234, Number.MAX_VALUE]) assert.throws(() => sizePresetPayload("Teste", [item("M", price)]), /^Error: size_price$/);
+assert.equal(sizePresetPayload("Teste", [item("M", 0.29)]).items[0].defaultPriceAdjustment, 0.29);
+assert.deepEqual(sizePresetPayload("Vazio", []).items, [], "existing empty presets remain supported");
+console.log("Size presets: labels, duplicates, monetary validation, ordering and payload whitelist passed.");

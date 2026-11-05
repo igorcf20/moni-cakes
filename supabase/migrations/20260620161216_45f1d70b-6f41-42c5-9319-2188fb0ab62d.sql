@@ -1,0 +1,1 @@
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS vat_rate numeric(5,2) NOT NULL DEFAULT 23.00;

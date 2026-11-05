@@ -1,0 +1,1 @@
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS recommended_category_ids uuid[] NOT NULL DEFAULT '{}'::uuid[];

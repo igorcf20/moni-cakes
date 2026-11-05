@@ -1,0 +1,1 @@
+DELETE FROM public.home_section_items WHERE section_key='gallery' AND image_url='https://cdn.lovable.dev/placeholder-gallery-1';

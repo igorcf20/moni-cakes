@@ -1,0 +1,13 @@
+[Unit]
+Description=Cópia de segurança diária da Moni Cakes, de madrugada (hora de Brasília)
+
+[Timer]
+# Entre as 03:30 e as 04:30 de Brasília (06:30 a 07:30 UTC), com pouco movimento na loja.
+OnCalendar=*-*-* 03:30:00 America/Sao_Paulo
+RandomizedDelaySec=1h
+# Se o VPS estava desligado à hora marcada, corre logo que o timer voltar a estar ativo.
+Persistent=true
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target

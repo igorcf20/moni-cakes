@@ -1,0 +1,1 @@
+UPDATE public.products SET name='Camisa Legal' WHERE id='tshirt-wave-jp';

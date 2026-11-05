@@ -1,0 +1,1 @@
+ALTER TABLE public.banners ADD COLUMN IF NOT EXISTS duration_seconds integer NOT NULL DEFAULT 6;

@@ -1,0 +1,676 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ================================================
+   TEMA DA LOJA
+   Os valores abaixo são o tema Moni Cakes e servem só de reserva: no arranque, src/theme/boot.ts
+   escreve por cima as cores e fontes da loja (src/config/store.ts e Admin > Marca e visual).
+   Para mudar a cara de uma loja, use o Admin ou src/theme/presets.ts, não este ficheiro.
+
+   Moni Cakes (logo e landing aprovada, nov/2026): confeitaria boutique.
+   Creme #FFF5E9 (fundo) · Branco (cartões) · Rosa profundo #A75269 (marca) · Coral #E87975 · Rosa antigo #B96979
+   Pêssego #F2AC87 · Dourado #B98242 · Marrom café #66351F; texto #3B2015. Valores em src/theme/presets.ts (moniCakes).
+   Títulos grandes (h1, h2) em Cormorant Garamond; texto e interface em Inter.
+   Os nomes antigos (--brand-orange*, --brand-gold*, --brand-navy...) são nomes técnicos da cor da marca.
+   ================================================ */
+
+@layer base {
+  :root {
+    --background: 33 100% 96%;
+    --foreground: 17 48% 16%;
+    --card: 0 0% 100%;
+    --card-foreground: 17 48% 16%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 17 48% 16%;
+    --primary: 344 34% 49%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 343 36% 41%;
+    --secondary: 20 77% 93%;
+    --secondary-foreground: 17 48% 16%;
+    --muted: 20 77% 93%;
+    --muted-foreground: 17 21% 41%;
+    --accent: 350 68% 93%;
+    --accent-foreground: 17 48% 16%;
+    --destructive: 0 72% 46%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 22 50% 88%;
+    --input: 21 40% 86%;
+    --ring: 344 34% 49%;
+    --radius: 0.875rem;                   /* 14px: botões 12-14, inputs 14 */
+
+    /* Fontes (Admin > Marca e visual > Fontes; lista em src/theme/fonts.ts) */
+    --font-body: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+    --font-heading: 'Cormorant Garamond Variable', Georgia, 'Times New Roman', serif;
+    --heading-weight: 560;
+    --heading-tracking: -0.01em;
+
+    /* Marca Moni Cakes */
+    --brand-orange: 344 34% 49%;
+    --brand-orange-2: 2 71% 68%;
+    --brand-orange-text: 343 36% 43%;
+    --brand-orange-soft: 350 68% 93%;
+    --brand-ink: 17 48% 16%;
+    --brand-ink-soft: 19 53% 26%;
+    --brand-alt: 20 77% 93%;
+    --card-border: 22 50% 88%;
+
+    /* Nomes herdados apontando para a paleta nova */
+    --brand-gold: var(--brand-orange);
+    --brand-gold-deep: var(--brand-orange-text);
+    --brand-gold-soft: var(--brand-orange-soft);
+    --brand-sand: var(--brand-alt);
+    --brand-navy: 17 48% 16%;
+    --brand-navy-deep: 16 46% 11%;
+    --brand-royal: 344 34% 49%;
+    --brand-royal-light: 2 71% 68%;
+    --brand-royal-glow: 2 72% 75%;
+    --brand-cyan: 2 72% 78%;
+    --brand-graphite: 17 48% 16%;
+    --brand-ash: 33 100% 96%;
+    --brand-mist: 20 77% 93%;
+    --brand-white: 0 0% 100%;
+    --surface-dark: 17 48% 16%;
+    --surface-dark-foreground: 0 0% 100%;
+    --surface-navy: 16 46% 11%;
+    --brand-yellow: 2 71% 68%;
+    --brand-red: 0 72% 46%;
+    --brand-black: 17 48% 16%;
+
+    --gradient-primary: linear-gradient(135deg, #E87975 0%, #B96979 100%);
+    --gradient-fire: var(--gradient-primary);
+    --gradient-splash: var(--gradient-primary);
+    --gradient-luxury: var(--gradient-primary);
+    --gradient-gold: var(--gradient-primary);
+    --gradient-hero: linear-gradient(180deg, #FFF5E9 0%, #FBE9E0 100%);
+    --gradient-card: linear-gradient(180deg, #FFFFFF 0%, #FFF5E9 100%);
+    --gradient-navy: linear-gradient(180deg, #41271C 0%, #3B2015 100%);
+    --gradient-header: linear-gradient(90deg, #3B2015, #41271C);
+    --gradient-mesh:
+      radial-gradient(circle at 80% 30%, rgba(255, 122, 24, 0.10), transparent 45%),
+      radial-gradient(circle at 10% 90%, rgba(255, 90, 10, 0.05), transparent 40%);
+
+    /* Sombras muito suaves */
+    --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px -6px rgba(0, 0, 0, 0.06);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.03), 0 8px 24px -14px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 14px 34px -18px rgba(0, 0, 0, 0.18);
+    --shadow-elevated: 0 18px 50px rgba(0, 0, 0, 0.10);
+    --shadow-luxury: 0 24px 60px -24px rgba(0, 0, 0, 0.22);
+    --shadow-glow-orange: none;
+    --shadow-ring-royal: 0 0 0 3px rgba(167, 82, 105, 0.18);
+
+    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Tema escuro opcional (não é o padrão da marca) */
+  .dark {
+    --background: 0 0% 7%;
+    --foreground: 38 40% 96%;
+    --card: 0 0% 10%;
+    --card-foreground: 38 40% 96%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 38 40% 96%;
+    --primary: 20 100% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 38 40% 96%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 20 40% 16%;
+    --accent-foreground: 38 40% 96%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 20 100% 55%;
+    --brand-orange-text: 22 100% 62%;
+    --brand-orange-soft: 20 40% 14%;
+    --brand-alt: 0 0% 11%;
+    --gradient-hero: linear-gradient(180deg, #121212, #171717);
+    --gradient-card: linear-gradient(180deg, #1a1a1a, #141414);
+  }
+
+  /* Grelha PRINT3D: conteúdo até 1320px; margens 16px (celular), 24px (tablet), 32px e 48px (desktop). */
+  .shell {
+    width: 100%;
+    max-width: calc(1320px + 96px);
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+  @media (min-width: 768px) { .shell { padding-inline: 24px; } }
+  @media (min-width: 1024px) { .shell { padding-inline: 32px; } }
+  @media (min-width: 1280px) { .shell { padding-inline: 48px; } }
+
+  .pattern-dots {
+    background-image: radial-gradient(circle at 1px 1px, hsl(var(--foreground) / 0.08) 1px, transparent 0);
+    background-size: 18px 18px;
+  }
+  .pattern-dots-light {
+    background-image: radial-gradient(circle at 1px 1px, hsl(0 0% 100% / 0.12) 1px, transparent 0);
+    background-size: 22px 22px;
+  }
+  .pattern-grid-light {
+    background-image:
+      linear-gradient(hsl(0 0% 100% / 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(0 0% 100% / 0.06) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+
+  .pattern-diagonal {
+    background-image: repeating-linear-gradient(
+      135deg,
+      hsl(var(--primary) / 0.06) 0 10px,
+      transparent 10px 20px
+    );
+  }
+
+  /* Dark surface helpers used by header/hero/footer panels */
+  .bg-surface-dark {
+    background-color: hsl(var(--surface-dark));
+    color: hsl(var(--surface-dark-foreground));
+  }
+  .bg-surface-navy {
+    background-color: hsl(var(--surface-navy));
+    color: hsl(var(--surface-dark-foreground));
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+    font-feature-settings: 'cv11', 'ss01';
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 750;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    color: hsl(var(--foreground));
+  }
+
+  /* Títulos com serifa (tema com fonte de títulos serifada, ver src/theme/applyTheme.ts): só os títulos grandes
+     da loja (h1, h2) ficam em serifa, com peso médio e x-height acertada à Inter (a serifa editorial é pequena);
+     subtítulos (h3 a h6) e o Admin, que é área de trabalho, continuam na fonte do texto. */
+  html[data-heading="serif"] :is(h1, h2):not(.admin-ui *) {
+    font-weight: var(--heading-weight) !important;
+    letter-spacing: var(--heading-tracking) !important;
+    font-size-adjust: 0.46;
+    line-height: 1.04;
+  }
+  html[data-heading="serif"] :is(h3, h4, h5, h6),
+  html[data-heading="serif"] .admin-ui :is(h1, h2) {
+    font-family: var(--font-body);
+  }
+  /* Título editorial fora de h1/h2 (ex.: nome de categoria sobre a foto). */
+  .font-editorial {
+    font-family: var(--font-heading);
+    font-weight: var(--heading-weight);
+    letter-spacing: var(--heading-tracking);
+  }
+  html[data-heading="serif"] .font-editorial { font-size-adjust: 0.46; }
+
+  /* Tom quente e discreto nas fotos de ambiente da página inicial (fotos de origens diferentes ficam coerentes). */
+  .photo-warm { filter: saturate(0.94) sepia(0.06) contrast(1.02); }
+
+  /* Barra lateral do Admin: grafite neutro (não muda com a cor da marca; o destaque ativo usa --primary). */
+  .admin-sidebar {
+    background-color: hsl(var(--admin-sidebar, 200 7% 9%));
+    color: hsl(0 0% 100% / 0.8);
+    scrollbar-color: hsl(0 0% 100% / 0.15) transparent;
+  }
+
+  .hover-lift {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .hover-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .hover-glow {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .hover-glow:hover {
+    box-shadow: 0 0 24px hsl(var(--primary) / 0.25);
+  }
+
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .stagger-fade-in > * {
+    opacity: 0;
+    animation: stagger-item 0.5s ease-out forwards;
+  }
+  .stagger-fade-in > *:nth-child(1) { animation-delay: 0.05s; }
+  .stagger-fade-in > *:nth-child(2) { animation-delay: 0.1s; }
+  .stagger-fade-in > *:nth-child(3) { animation-delay: 0.15s; }
+  .stagger-fade-in > *:nth-child(4) { animation-delay: 0.2s; }
+  .stagger-fade-in > *:nth-child(5) { animation-delay: 0.25s; }
+  .stagger-fade-in > *:nth-child(6) { animation-delay: 0.3s; }
+  .stagger-fade-in > *:nth-child(7) { animation-delay: 0.35s; }
+  .stagger-fade-in > *:nth-child(8) { animation-delay: 0.4s; }
+  .stagger-fade-in > *:nth-child(9) { animation-delay: 0.45s; }
+  .stagger-fade-in > *:nth-child(10) { animation-delay: 0.5s; }
+  .stagger-fade-in > *:nth-child(11) { animation-delay: 0.55s; }
+  .stagger-fade-in > *:nth-child(12) { animation-delay: 0.6s; }
+
+  @keyframes stagger-item {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hover-underline {
+    position: relative;
+  }
+  .hover-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: hsl(var(--primary));
+    transition: width 0.3s ease;
+  }
+  .hover-underline:hover::after {
+    width: 100%;
+  }
+
+  .pulse-soft {
+    animation: pulse-soft 2s ease-in-out infinite;
+  }
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+  }
+  .skeleton {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(to right, hsl(var(--muted)) 0%, hsl(var(--muted-foreground) / 0.1) 20%, hsl(var(--muted)) 40%, hsl(var(--muted)) 100%);
+    background-size: 1000px 100%;
+  }
+
+  .card-hover {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card-hover:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .btn-shine { position: relative; overflow: hidden; }
+  .btn-shine::before {
+    content: '';
+    position: absolute; top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.2), transparent);
+    transition: left 0.5s;
+  }
+  .btn-shine:hover::before { left: 100%; }
+
+  .img-zoom { overflow: hidden; }
+  .img-zoom img {
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .img-zoom:hover img { transform: scale(1.08); }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes zoom-out {
+    from { transform: scale(1.08); }
+    to { transform: scale(1); }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.6s ease-out both;
+  }
+
+  .bg-gradient-primary { background: var(--gradient-primary); }
+  .bg-gradient-gold { background: var(--gradient-gold); }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: hsl(var(--brand-gold-deep));
+    font-family: 'Inter Variable', 'Inter', sans-serif;
+  }
+
+  .divider-gold {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.4), transparent);
+  }
+
+  .card-premium {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-card);
+    transition: box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+  }
+  .card-premium:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-3px);
+    border-color: hsl(var(--primary) / 0.3);
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slide-in-right {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .animate-slide-up { animation: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .animate-slide-in-right { animation: slide-in-right 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+  @keyframes page-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+  /* "backwards" (e não "both"): no fim da animação não fica transform nenhum, que prenderia os elementos
+     fixos (barras, gaveta) e o pin do GSAP da página inicial. */
+  .animate-page-in {
+    animation: page-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-page-in { animation: none !important; }
+  }
+
+  /* Stagger children on mount via nth-child delays */
+  .stagger-in > * {
+    opacity: 0;
+    animation: page-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .stagger-in > *:nth-child(1) { animation-delay: 0.05s; }
+  .stagger-in > *:nth-child(2) { animation-delay: 0.12s; }
+  .stagger-in > *:nth-child(3) { animation-delay: 0.19s; }
+  .stagger-in > *:nth-child(4) { animation-delay: 0.26s; }
+  .stagger-in > *:nth-child(5) { animation-delay: 0.33s; }
+  .stagger-in > *:nth-child(6) { animation-delay: 0.40s; }
+  .stagger-in > *:nth-child(7) { animation-delay: 0.47s; }
+  .stagger-in > *:nth-child(8) { animation-delay: 0.54s; }
+  .stagger-in > *:nth-child(n+9) { animation-delay: 0.6s; }
+  @media (prefers-reduced-motion: reduce) {
+    .stagger-in > * { opacity: 1 !important; animation: none !important; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+  .reveal-left { transform: translateX(-24px); }
+  .reveal-right { transform: translateX(24px); }
+  .reveal-scale { transform: scale(0.96); }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+
+  /* ─── Refined additions ─────────────────────────────── */
+
+  /* Glass surface for scrolled header / floating panels */
+  .glass-navy {
+    background: linear-gradient(180deg,
+      hsl(var(--brand-navy-deep) / 0.92) 0%,
+      hsl(var(--brand-navy) / 0.88) 100%);
+    backdrop-filter: saturate(140%) blur(16px);
+    -webkit-backdrop-filter: saturate(140%) blur(16px);
+    border-bottom: 1px solid hsl(0 0% 100% / 0.06);
+  }
+  .glass-light {
+    background: hsl(0 0% 100% / 0.72);
+    backdrop-filter: saturate(140%) blur(14px);
+    -webkit-backdrop-filter: saturate(140%) blur(14px);
+  }
+
+  /* Royal-blue accent underline that grows on hover */
+  .nav-link {
+    position: relative;
+    padding: 0.25rem 0;
+    transition: color 0.25s ease;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    right: 50%;
+    bottom: -6px;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg,
+      hsl(var(--brand-royal-light)) 0%,
+      hsl(var(--brand-royal)) 100%);
+    transition: left 0.35s var(--ease-out-expo), right 0.35s var(--ease-out-expo);
+  }
+  .nav-link:hover::after,
+  .nav-link[data-active="true"]::after {
+    left: 0;
+    right: 0;
+  }
+
+  /* Gradient border card — royal blue reveal on hover */
+  .card-luxe {
+    position: relative;
+    background: hsl(var(--card));
+    border-radius: 1rem;
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.5s var(--ease-out-expo), box-shadow 0.5s var(--ease-out-expo);
+  }
+  .card-luxe::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(140deg,
+      hsl(var(--brand-royal-light) / 0.4) 0%,
+      transparent 40%,
+      transparent 60%,
+      hsl(var(--brand-royal) / 0.35) 100%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .card-luxe:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-elevated);
+  }
+  .card-luxe:hover::before { opacity: 1; }
+
+  /* Soft royal glow — for hero image, CTAs, category circles */
+  .glow-royal { box-shadow: 0 20px 60px -18px hsl(var(--brand-royal) / 0.55); }
+  .glow-royal-soft { box-shadow: 0 14px 40px -14px hsl(var(--brand-royal) / 0.35); }
+
+  /* Text gradient accent */
+  .text-gradient-royal {
+    background: linear-gradient(135deg,
+      hsl(var(--brand-royal-light)) 0%,
+      hsl(var(--brand-royal)) 55%,
+      hsl(var(--brand-cyan)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Section eyebrow — uppercase tag with dot */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: hsl(var(--primary));
+  }
+  .eyebrow::before {
+    content: '';
+    width: 26px;
+    height: 2px;
+    background: hsl(var(--primary));
+    border-radius: 2px;
+  }
+
+  /* Animated shimmer for CTA buttons */
+  @keyframes cta-shimmer {
+    0%   { transform: translateX(-120%) skewX(-20deg); }
+    100% { transform: translateX(220%)  skewX(-20deg); }
+  }
+  .cta-royal {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .cta-royal::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      hsl(0 0% 100% / 0.22) 50%,
+      transparent 100%);
+    animation: cta-shimmer 2.6s ease-in-out infinite;
+    animation-delay: 1.2s;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Blurred floating blob for hero backgrounds */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* Subtle animated gradient border ring (used on category thumbnails) */
+  @keyframes ring-rotate { to { transform: rotate(360deg); } }
+  .ring-royal {
+    position: relative;
+  }
+  .ring-royal::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg,
+      hsl(var(--brand-royal)) 0deg,
+      hsl(var(--brand-royal-light)) 90deg,
+      transparent 200deg,
+      hsl(var(--brand-royal)) 360deg);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: -1;
+    animation: ring-rotate 6s linear infinite;
+  }
+  .ring-royal:hover::before { opacity: 0.9; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal, .reveal-left, .reveal-right, .reveal-scale {
+      opacity: 1 !important;
+      transform: none !important;
+      transition: none !important;
+    }
+    .cta-royal::after,
+    .ring-royal::before { animation: none !important; }
+  }
+}
+
+
+/* Admin orders — stack table as cards on mobile so nothing needs horizontal scroll */
+@media (max-width: 767px) {
+  .admin-orders-table,
+  .admin-orders-table thead,
+  .admin-orders-table tbody,
+  .admin-orders-table tr,
+  .admin-orders-table th,
+  .admin-orders-table td {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .admin-orders-table thead { display: none; }
+  .admin-orders-table > tbody > tr {
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.75rem;
+    background: hsl(var(--card));
+  }
+  .admin-orders-table > tbody > tr > td {
+    border: 0 !important;
+    padding: 0.35rem 0 !important;
+    text-align: left !important;
+    white-space: normal !important;
+  }
+  /* seta e caixa de seleção lado a lado no topo do cartão */
+  .admin-orders-table > tbody > tr > td.admin-orders-mini {
+    display: inline-block;
+    width: auto;
+    margin-right: 0.75rem;
+    vertical-align: middle;
+  }
+  .admin-orders-table > tbody > tr > td .flex.justify-end {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+}
+
+/* Hero: progress fill of the active slide; its end advances the carousel. */
+@keyframes hero-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* Smooth in-page scrolling (anchors, "back to top"), clear of the sticky header. */
+html { scroll-padding-top: 7rem; }
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}

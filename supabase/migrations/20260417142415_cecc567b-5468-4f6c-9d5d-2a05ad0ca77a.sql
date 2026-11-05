@@ -1,0 +1,1 @@
+DELETE FROM public.menu_items WHERE title IN ('Destaques','Promoções','Promocoes','Kits','Rastrear Pedido','Todos os Produtos','Início','Categorias');

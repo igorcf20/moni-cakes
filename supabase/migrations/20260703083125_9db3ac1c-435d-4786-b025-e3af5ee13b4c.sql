@@ -1,0 +1,1 @@
+UPDATE public.products SET promo_active = true, promo_ends_at = now() + interval '7 days' WHERE slug = 't-shirt-dogo-premium';

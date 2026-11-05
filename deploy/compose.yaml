@@ -1,0 +1,304 @@
+# Moni Cakes: stack completa no VPS, sem nenhum serviço externo da Supabase.
+# PostgreSQL + auth (GoTrue) + REST (PostgREST) + ficheiros (storage-api) + Edge Functions (edge-runtime),
+# com as mesmas APIs que o supabase-js do site já usa. O nginx do serviço web serve o site e é o gateway
+# (/rest/v1, /auth/v1, /storage/v1, /functions/v1) no mesmo domínio.
+#
+# Variáveis: lidas do ambiente (o sync.sh faz "set -a; . ~/monicakes/env"). Segredos gerados por deploy/gen-secrets.sh.
+# Só o serviço web publica porta (127.0.0.1:LOJA3D_HTTP_PORT). Os dados ficam em volumes nomeados do projeto
+# (monicakes_db-data, monicakes_storage-data, monicakes_db-config): atualizar o site nunca os apaga.
+# Orçamento de memória: cerca de 1,5 GB no total (mem_limit em cada serviço).
+name: monicakes
+
+x-base: &base
+  restart: unless-stopped
+  security_opt:
+    - no-new-privileges:true
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+services:
+  db:
+    <<: *base
+    image: supabase/postgres:17.6.1.136
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      PGPORT: "5432"
+      POSTGRES_PORT: "5432"
+      PGPASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD (corra deploy/gen-secrets.sh)}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD (corra deploy/gen-secrets.sh)}
+      PGDATABASE: postgres
+      POSTGRES_DB: postgres
+      JWT_EXP: ${JWT_EXPIRY:-3600}
+    volumes:
+      # Scripts da 1.ª inicialização (só correm com o volume de dados vazio). O log-ddl-off/on tira do
+      # registo da base os "ALTER USER ... WITH PASSWORD" da inicialização (palavra-passe em texto).
+      - ./db/log-ddl-off.sql:/docker-entrypoint-initdb.d/init-scripts/00-loja3d-log-ddl-off.sql:ro
+      - ./db/log-ddl-on.sql:/docker-entrypoint-initdb.d/migrations/99-loja3d-log-ddl-on.sql:ro
+      - ./db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:ro
+      - ./db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:ro
+      - ./db/jwt.sql:/docker-entrypoint-initdb.d/init-scripts/99-jwt.sql:ro
+      - db-data:/var/lib/postgresql/data
+      # Configuração e chave do pgsodium/vault: tem de acompanhar o volume de dados.
+      - db-config:/etc/postgresql-custom
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    stop_grace_period: 60s
+    mem_limit: 512m
+
+  auth:
+    <<: *base
+    image: supabase/gotrue:v2.196.0
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: "9999"
+      # Endereço público do auth (links dos e-mails, emissor dos JWT).
+      API_EXTERNAL_URL: ${SITE_URL:-http://127.0.0.1:8191}/auth/v1
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD}@db:5432/postgres
+      GOTRUE_SITE_URL: ${SITE_URL:-http://127.0.0.1:8191}
+      # Redirecionamentos para o mesmo domínio de SITE_URL já são aceites; outros, separados por vírgula.
+      GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS:-}
+      # Registo aberto (clientes da loja).
+      GOTRUE_DISABLE_SIGNUP: "false"
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_EXP: ${JWT_EXPIRY:-3600}
+      GOTRUE_JWT_SECRET: ${JWT_SECRET:?Falta JWT_SECRET (corra deploy/gen-secrets.sh)}
+      GOTRUE_JWT_ISSUER: ${SITE_URL:-http://127.0.0.1:8191}/auth/v1
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
+      GOTRUE_EXTERNAL_PHONE_ENABLED: "false"
+      GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED: "false"
+      GOTRUE_SMS_AUTOCONFIRM: "false"
+      # Sem SMTP, a conta fica ativa logo no registo (o sync.sh passa a false quando há SMTP_HOST).
+      GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM:-true}
+      GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: "true"
+      GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL:-}
+      GOTRUE_SMTP_HOST: ${SMTP_HOST:-}
+      GOTRUE_SMTP_PORT: ${SMTP_PORT:-587}
+      GOTRUE_SMTP_USER: ${SMTP_USER:-}
+      GOTRUE_SMTP_PASS: ${SMTP_PASS:-}
+      GOTRUE_SMTP_SENDER_NAME: ${SMTP_SENDER_NAME:-}
+      GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/v1/verify
+      # Mesma regra mínima do formulário do site (8 caracteres).
+      GOTRUE_PASSWORD_MIN_LENGTH: ${AUTH_PASSWORD_MIN_LENGTH:-8}
+      GOTRUE_SECURITY_REFRESH_TOKEN_ROTATION_ENABLED: "true"
+      # Limites de taxa por IP: o GoTrue só os aplica com este cabeçalho (o nginx do web define X-Real-IP).
+      GOTRUE_RATE_LIMIT_HEADER: X-Real-IP
+      GOTRUE_RATE_LIMIT_TOKEN_REFRESH: ${AUTH_RATE_LIMIT_TOKEN_REFRESH:-150}
+      GOTRUE_RATE_LIMIT_VERIFY: ${AUTH_RATE_LIMIT_VERIFY:-30}
+      GOTRUE_RATE_LIMIT_OTP: ${AUTH_RATE_LIMIT_OTP:-30}
+      GOTRUE_RATE_LIMIT_EMAIL_SENT: ${AUTH_RATE_LIMIT_EMAIL_SENT:-30}
+      # Entrar com Google / Facebook (Admin > Segurança da conta explica). Desligado sem as chaves no env.
+      GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${GOOGLE_LOGIN_ENABLED:-false}
+      GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOTRUE_EXTERNAL_GOOGLE_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOTRUE_EXTERNAL_GOOGLE_REDIRECT_URI: ${SITE_URL:-http://127.0.0.1:8191}/auth/v1/callback
+      GOTRUE_EXTERNAL_FACEBOOK_ENABLED: ${FACEBOOK_LOGIN_ENABLED:-false}
+      GOTRUE_EXTERNAL_FACEBOOK_CLIENT_ID: ${FACEBOOK_APP_ID:-}
+      GOTRUE_EXTERNAL_FACEBOOK_SECRET: ${FACEBOOK_APP_SECRET:-}
+      GOTRUE_EXTERNAL_FACEBOOK_REDIRECT_URI: ${SITE_URL:-http://127.0.0.1:8191}/auth/v1/callback
+      # Verificação em dois passos (app autenticador) para o Admin.
+      GOTRUE_MFA_TOTP_ENROLL_ENABLED: "true"
+      GOTRUE_MFA_TOTP_VERIFY_ENABLED: "true"
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:9999/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    # Uso real cerca de 10 MB.
+    mem_limit: 64m
+
+  rest:
+    <<: *base
+    image: postgrest/postgrest:v14.17
+    command: ["postgrest"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@db:5432/postgres
+      PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS:-public,graphql_public}
+      PGRST_DB_MAX_ROWS: ${PGRST_DB_MAX_ROWS:-1000}
+      # Igual ao Supabase alojado: funções das extensões (pgcrypto, etc.) visíveis nas RPC.
+      PGRST_DB_EXTRA_SEARCH_PATH: public,extensions
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+      PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY:-3600}
+      # Sem a descrição OpenAPI em /rest/v1/ (lista de tabelas, colunas e funções RPC), que respondia a
+      # qualquer pedido, até sem chave. O site não a usa; /rest/v1/ passa a responder 404 (PGRST126).
+      PGRST_OPENAPI_MODE: disabled
+      # Servidor de administração só dentro do contentor (para o healthcheck --ready).
+      PGRST_ADMIN_SERVER_PORT: "3001"
+      PGRST_ADMIN_SERVER_HOST: localhost
+    healthcheck:
+      test: ["CMD", "postgrest", "--ready"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    # Uso real cerca de 30 MB.
+    mem_limit: 96m
+
+  storage:
+    <<: *base
+    image: supabase/storage-api:v1.74.0
+    depends_on:
+      db:
+        condition: service_healthy
+      rest:
+        condition: service_started
+    environment:
+      ANON_KEY: ${ANON_KEY:?Falta ANON_KEY (corra deploy/gen-secrets.sh)}
+      SERVICE_KEY: ${SERVICE_ROLE_KEY:?Falta SERVICE_ROLE_KEY (corra deploy/gen-secrets.sh)}
+      POSTGREST_URL: http://rest:3000
+      AUTH_JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD}@db:5432/postgres
+      STORAGE_PUBLIC_URL: ${SITE_URL:-http://127.0.0.1:8191}
+      REQUEST_ALLOW_X_FORWARDED_PATH: "true"
+      # Tamanho máximo de um ficheiro (bytes). O nginx aceita até 60 MB nesta rota.
+      FILE_SIZE_LIMIT: ${STORAGE_FILE_SIZE_LIMIT:-52428800}
+      STORAGE_BACKEND: file
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      # Com o backend "file", é o nome da pasta dentro do volume.
+      GLOBAL_S3_BUCKET: loja3d
+      TENANT_ID: loja3d
+      REGION: local
+      ENABLE_IMAGE_TRANSFORMATION: "false"
+      S3_PROTOCOL_ENABLED: "false"
+    volumes:
+      - storage-data:/var/lib/storage
+    healthcheck:
+      # 127.0.0.1 e não localhost: em VPS com IPv6 o localhost vira ::1 e o serviço só ouve em IPv4.
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:5000/status"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    mem_limit: 256m
+
+  functions:
+    <<: *base
+    image: supabase/edge-runtime:v1.76.2
+    # Router principal próprio (deploy/functions/main/index.ts): verifica o JWT por função conforme
+    # supabase/config.toml e encaminha para /home/deno/functions/<nome>.
+    command: ["start", "--main-service", "/home/deno/main", "--user-worker-request-idle-timeout", "150000"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      # As funções falam com a API através do gateway (nginx do web), como no Supabase alojado.
+      SUPABASE_URL: http://web:8080
+      SUPABASE_PUBLIC_URL: ${SITE_URL:-http://127.0.0.1:8191}
+      SUPABASE_ANON_KEY: ${ANON_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
+      SUPABASE_DB_URL: postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
+      SITE_URL: ${SITE_URL:-http://127.0.0.1:8191}
+      # Verificação de JWT por omissão; config.toml desliga-a por função (verify_jwt = false).
+      VERIFY_JWT: "true"
+      FUNCTIONS_PATH: /home/deno/functions
+      FUNCTIONS_CONFIG: /home/deno/config.toml
+      # Segredos opcionais das integrações (vazios se não estiverem em ~/monicakes/env).
+      CRON_SECRET: ${CRON_SECRET:-}
+      VIVA_WEBHOOK_STRICT_IP: ${VIVA_WEBHOOK_STRICT_IP:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL:-}
+      SMTP_SENDER_NAME: ${SMTP_SENDER_NAME:-}
+    volumes:
+      - ../supabase/functions:/home/deno/functions:ro
+      - ./functions/main:/home/deno/main:ro
+      - ../supabase/config.toml:/home/deno/config.toml:ro
+      - deno-cache:/root/.cache/deno
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/127.0.0.1/9000'"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    # Cada função ativa ocupa cerca de 20 MB e fica viva 60 s depois do último pedido. O router aceita até
+    # 18 funções ativas ao mesmo tempo (FUNCTIONS_MAX_ACTIVE; acima disso responde 503 com Retry-After),
+    # o que cabe em 512 MB. Sem esse limite, um pico de pedidos a muitas funções esgotava a memória.
+    mem_limit: 512m
+
+  web:
+    <<: *base
+    image: monicakes-web:${IMAGE_TAG:-latest}
+    build:
+      context: ..
+      args:
+        # Só a chave pública (papel anon). A SERVICE_ROLE_KEY nunca entra no build.
+        VITE_SUPABASE_PUBLISHABLE_KEY: ${ANON_KEY:?Falta ANON_KEY (corra deploy/gen-secrets.sh)}
+        # Endereço público para links de e-mail; vazio = endereço aberto no navegador.
+        VITE_SITE_URL: ${SITE_URL:-}
+    depends_on:
+      - auth
+      - rest
+      - storage
+      - functions
+    ports:
+      - "127.0.0.1:${LOJA3D_HTTP_PORT:-8191}:8080"
+    # nginx: uso real abaixo de 10 MB.
+    mem_limit: 64m
+
+  # Uso único: cópia de segurança + migrations pendentes (deploy/migrate.sh).
+  #   docker compose -f deploy/compose.yaml run --rm migrate            aplica as pendentes
+  #   docker compose -f deploy/compose.yaml run --rm migrate --status   só mostra o estado
+  migrate:
+    <<: *base
+    image: supabase/postgres:17.6.1.136
+    profiles: ["tools"]
+    restart: "no"
+    entrypoint: ["sh", "/loja3d/deploy/migrate.sh"]
+    # Cópias de segurança com o dono do utilizador do VPS (o sync.sh exporta LOJA3D_UID/LOJA3D_GID).
+    user: "${LOJA3D_UID:-0}:${LOJA3D_GID:-0}"
+    depends_on:
+      db:
+        condition: service_healthy
+      auth:
+        condition: service_healthy
+      storage:
+        condition: service_healthy
+    environment:
+      PGHOST: db
+      PGPORT: "5432"
+      PGDATABASE: postgres
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      MIGRATE_USER: postgres
+      BACKUP_USER: supabase_admin
+      MIGRATIONS_DIR: /loja3d/supabase/migrations
+      BACKUP_DIR: /backups
+      BACKUP_KEEP: ${BACKUP_KEEP:-10}
+      # Copiados para o Vault da base (pedidos do pg_cron às funções em http://web:8080/functions/v1).
+      CRON_SECRET: ${CRON_SECRET:-}
+      ANON_KEY: ${ANON_KEY}
+    volumes:
+      - ./migrate.sh:/loja3d/deploy/migrate.sh:ro
+      - ../supabase/migrations:/loja3d/supabase/migrations:ro
+      - ${LOJA3D_BACKUP_DIR:-${HOME}/loja3d/backups}:/backups
+    mem_limit: 256m
+
+volumes:
+  db-data:
+  db-config:
+  storage-data:
+  deno-cache:

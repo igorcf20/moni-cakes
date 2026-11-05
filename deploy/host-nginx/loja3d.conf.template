@@ -1,0 +1,23 @@
+# nginx do SERVIDOR (host) para a loja: só este subdomínio, encaminha para o contentor web na porta local.
+# Instalado por deploy/expose-domain.sh; o certbot acrescenta o bloco HTTPS e o redirecionamento.
+server {
+    listen 80;
+    listen [::]:80;
+    server_name __DOMAIN__;
+
+    # Fotos e arquivos 3D enviados pelo site e pelo Admin
+    client_max_body_size 60m;
+
+    location / {
+        proxy_pass http://127.0.0.1:__PORT__;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        # Funções do servidor (pedidos, pagamentos) podem demorar
+        proxy_read_timeout 150s;
+        proxy_send_timeout 150s;
+    }
+}
