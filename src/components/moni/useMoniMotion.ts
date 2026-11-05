@@ -17,6 +17,23 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
+// No celular a barra de endereço aparece e some durante a rolagem: isso não deve recalcular tudo a cada gesto.
+ScrollTrigger.config({ ignoreMobileResize: true });
+
+/** Recalcula as posições quando a altura da página muda depois do arranque (banners, kits, rodapé e imagens que
+ *  chegam mais tarde). Sem isto, no celular os gatilhos ficam nas posições antigas e as animações disparam fora do ecrã. */
+function refreshOnResize(el: HTMLElement) {
+  let last = el.offsetHeight;
+  let timer = 0;
+  const ro = new ResizeObserver(() => {
+    const h = el.offsetHeight;
+    if (Math.abs(h - last) < 2) return;
+    window.clearTimeout(timer);
+    timer = window.setTimeout(() => { ScrollTrigger.refresh(); last = el.offsetHeight; }, 180);
+  });
+  ro.observe(el);
+  return () => { ro.disconnect(); window.clearTimeout(timer); };
+}
 
 const q = <T extends Element = HTMLElement>(root: Element, sel: string) => Array.from(root.querySelectorAll<T>(sel));
 
@@ -200,6 +217,8 @@ export function useMoniMotion(root: RefObject<HTMLElement>, ready: boolean) {
         }
 
       ScrollTrigger.refresh();
+      const stop = refreshOnResize(el);
+      ctx.add(() => stop);
     });
     return () => mm.revert();
   }, [root, ready]);

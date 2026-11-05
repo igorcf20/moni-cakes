@@ -23,7 +23,7 @@ import { Helmet } from "react-helmet";
 import { toast } from "sonner";
 import {
   AlertCircle, ArrowRight, Box, CalendarCheck, CalendarClock, CalendarOff, CheckCircle2, ChevronDown, ChevronLeft, Clock, Coins, Copy, CreditCard, FileDown, Gift, Info,
-  Landmark, Loader2, Lock, Mail, MapPin, MessageCircle, Pencil, Phone, Plus, Printer, QrCode, Receipt, RefreshCw, ShieldCheck,
+  Landmark, Loader2, Lock, Mail, MapPin, MessageCircle, Pencil, Phone, Plus, ChefHat, QrCode, Receipt, RefreshCw, ShieldCheck,
   ListChecks, ShoppingBag, Smartphone, Store, Tag, Truck, User, Wallet, type LucideIcon,
 } from "lucide-react";
 import Header from "@/components/Header";
@@ -2758,7 +2758,7 @@ function CartItemRow({ item, currency, t }: { item: SummaryItem; currency: any; 
 function TrustSeals({ t, ships }: { t: Translate; ships: boolean }) {
   const seals: Array<[LucideIcon, string, string]> = [
     [ShieldCheck, t("trustSecure"), t("trustSecureSub")],
-    [Printer, t("trustMade"), t("trustMadeSub")],
+    [ChefHat, t("trustMade"), t("trustMadeSub")],
     ...(ships ? [[Truck, t("trustShip"), t("trustShipSub")] as [LucideIcon, string, string]] : []),
   ];
   return (

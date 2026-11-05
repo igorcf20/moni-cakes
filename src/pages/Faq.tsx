@@ -1,4 +1,4 @@
-// Perguntas frequentes (/faq): perguntas da PRINT3D por grupo (os ids dos grupos servem de âncora, ex. /faq#envios),
+// Perguntas frequentes (/faq): perguntas da loja por grupo (os ids dos grupos servem de âncora, ex. /faq#envios),
 // busca dentro das perguntas e respostas (também por ?q=), filtro por tema e JSON-LD FAQPage no idioma atual.
 // Perguntas escritas no Admin > Perguntas frequentes (site_faqs, useSiteFaqs) entram no grupo com o mesmo nome ou num
 // grupo novo; grupos padrão podem ser escondidos no Admin (faq_settings.hiddenGroups).
@@ -10,7 +10,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
 import {
-  ArrowRight, CreditCard, HelpCircle, Layers, Mail, MessageCircle, PackageCheck, RotateCcw, Search, SearchX, Truck, UserRound, X, type LucideIcon,
+  ArrowRight, CakeSlice, CreditCard, HelpCircle, Mail, MessageCircle, PackageCheck, RotateCcw, Search, SearchX, Truck, UserRound, X, type LucideIcon,
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { LayerArt } from '@/components/MediaImage';
@@ -34,14 +34,14 @@ type Group = { id: string; title: FK; Icon: LucideIcon; items: Item[]; label?: s
 const contact = { to: '/contatos', label: 'link_contact' } as const;
 const GROUPS: Group[] = [
   {
-    id: 'produtos', title: 'g_products', Icon: Layers,
-    items: [{ id: 'mat_how' }, { id: 'mat_pla' }, { id: 'mat_other', link: { to: '/orcamento-3d', label: 'link_quote' } }, { id: 'mat_colors' }, { id: 'mat_layers' }, { id: 'mat_strength', link: contact }, { id: 'mat_food' }],
+    id: 'produtos', title: 'g_products', Icon: CakeSlice,
+    items: [{ id: 'mat_how' }, { id: 'mat_pla' }, { id: 'mat_other', link: contact }, { id: 'mat_colors' }, { id: 'mat_layers' }, { id: 'mat_strength', link: contact }, { id: 'mat_food', link: contact }],
   },
   {
     id: 'pedidos', title: 'g_orders', Icon: PackageCheck,
     items: [
-      { id: 'ord_stock' }, { id: 'ord_time' }, { id: 'ord_custom', link: { to: '/personalizar', label: 'link_customizer' } },
-      { id: 'ord_file', link: { to: '/orcamento-3d', label: 'link_quote' } }, { id: 'ord_change', link: contact }, { id: 'ord_bulk', link: contact },
+      { id: 'ord_stock' }, { id: 'ord_time' }, { id: 'ord_custom', link: { to: '/categoria/bolos-personalizados', label: 'link_customizer' } },
+      { id: 'ord_file', link: contact }, { id: 'ord_change', link: contact }, { id: 'ord_bulk', link: contact },
     ],
   },
   { id: 'envios', title: 'g_shipping', Icon: Truck, items: [{ id: 'shp_where' }, { id: 'shp_time' }, { id: 'shp_cost' }, { id: 'shp_track', link: { to: '/rastrear', label: 'link_track' } }] },

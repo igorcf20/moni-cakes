@@ -10,10 +10,9 @@
 // =====================================================================================
 import { useMemo } from "react";
 import { CartStockError } from "@/hooks/useCart";
-import FeatureLink from "@/components/FeatureLink";
 import { useFeature } from "@/hooks/useFeatures";
 import { Link, useNavigate } from "react-router-dom";
-import { ChevronRight, Package, Percent, Sparkles, Upload, Wand2 } from "lucide-react";
+import { ChevronRight, MessageCircle, Package, Percent, Sparkles, Wand2 } from "lucide-react";
 import { toast } from "sonner";
 import { ProductCard3D, ProductCardSkeleton, type CardProduct } from "@/components/product/ProductCard3D";
 import type { Order } from "@/hooks/useOrders";
@@ -172,7 +171,7 @@ export default function AccountForYou({ userId, orders, ordersLoading, onOrders,
         onAdd={add} favorites={favorites} onSeeAll={picks.length > 4 ? () => navigate("/produtos?ordem=best") : undefined} seeAll={t("fySeeAll")}
       />}
 
-      {/* Crie uma peça */}
+      {/* Bolo personalizado: atalhos para os personalizados do cardápio e para o contato */}
       {show.create && <section className={cn(cardCls, "relative overflow-hidden p-5 sm:p-7")} aria-labelledby="fy-create">
         <div className="pointer-events-none absolute inset-0 opacity-60" style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(23,23,23,0.03) 0 1px, transparent 1px 7px)" }} aria-hidden="true" />
         <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
@@ -184,8 +183,8 @@ export default function AccountForYou({ userId, orders, ordersLoading, onOrders,
             </div>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
-            <FeatureLink to="/personalizar" className={cn(btnPrimary, "min-h-11 px-5 text-[14px]")}><Wand2 className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />{t("fyCreateCta")}</FeatureLink>
-            <FeatureLink to="/orcamento-3d" className={cn(btnSecondary, "min-h-11 px-5 text-[14px]")}><Upload className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />{t("fyQuoteCta")}</FeatureLink>
+            <Link to="/categoria/bolos-personalizados" className={cn(btnPrimary, "min-h-11 px-5 text-[14px]")}><Wand2 className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />{t("fyCreateCta")}</Link>
+            <Link to="/contatos" className={cn(btnSecondary, "min-h-11 px-5 text-[14px]")}><MessageCircle className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />{t("fyQuoteCta")}</Link>
           </div>
         </div>
       </section>}

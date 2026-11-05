@@ -1,14 +1,13 @@
-// Sobre a loja (/sobre): história curta, como fazemos (#impressao-3d), materiais (#materiais),
-// valores (#sustentabilidade) e chamada para o catálogo e o orçamento 3D. Sem números, prémios nem morada inventados.
+// Sobre a loja (/sobre): história curta, como fazemos (#como-fazemos), ingredientes (#materiais),
+// valores (#feito-a-mao) e chamada para o cardápio e o contato. Sem números, prémios nem morada inventados.
 // Com uma versão publicada no Admin > Páginas da loja (site_pages, idioma do visitante), mostra o texto da loja
 // no lugar deste (CustomAbout).
 import { STORE_DEFAULTS } from "@/config/store";
-import FeatureLink from "@/components/FeatureLink";
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { motion } from 'framer-motion';
 import {
-  ArrowRight, BadgeCheck, Boxes, Globe2, Layers, Leaf, PackageCheck, Palette, PenTool, ShieldCheck, Sparkles, Truck, Upload, Wand2,
+  ArrowRight, BadgeCheck, CakeSlice, ChefHat, Flower2, Hand, Heart, Layers, MessageCircle, PackageCheck, Palette, Sparkles, Truck, Wand2, Wheat,
   type LucideIcon,
 } from 'lucide-react';
 import { MediaImage, LayerArt } from '@/components/MediaImage';
@@ -26,23 +25,23 @@ import { cn } from '@/lib/utils';
 type T = ReturnType<typeof useMessages<typeof aboutMessages['pt-BR']>>['t'];
 type K = Parameters<T>[0];
 
-const POINTS: [LucideIcon, K][] = [[PackageCheck, 'point1'], [Wand2, 'point2'], [Globe2, 'point3']];
+const POINTS: [LucideIcon, K][] = [[PackageCheck, 'point1'], [Wand2, 'point2'], [Hand, 'point3']];
 const STEPS: [LucideIcon, K, K][] = [
-  [PenTool, 'step1Title', 'step1Text'],
-  [Layers, 'step2Title', 'step2Text'],
+  [MessageCircle, 'step1Title', 'step1Text'],
+  [ChefHat, 'step2Title', 'step2Text'],
   [Sparkles, 'step3Title', 'step3Text'],
   [Truck, 'step4Title', 'step4Text'],
 ];
 const MATERIALS: [LucideIcon, K, K][] = [
-  [Leaf, 'matPlaTitle', 'matPlaText'],
-  [ShieldCheck, 'matPetgTitle', 'matPetgText'],
-  [Boxes, 'matOtherTitle', 'matOtherText'],
+  [Wheat, 'matPlaTitle', 'matPlaText'],
+  [CakeSlice, 'matPetgTitle', 'matPetgText'],
+  [Flower2, 'matOtherTitle', 'matOtherText'],
 ];
 const VALUES: [LucideIcon, K, K, string?][] = [
   [Palette, 'valDesignTitle', 'valDesignText'],
   [BadgeCheck, 'valQualityTitle', 'valQualityText'],
   [Wand2, 'valCustomTitle', 'valCustomText'],
-  [Leaf, 'valSustainTitle', 'valSustainText', 'sustentabilidade'],
+  [Heart, 'valSustainTitle', 'valSustainText', 'feito-a-mao'],
 ];
 
 function IconTile({ Icon, className }: { Icon: LucideIcon; className?: string }) {
@@ -132,15 +131,16 @@ const About = () => {
               <Link to="/produtos" className={cn(btnPrimary, 'group')}>
                 {t('ctaProducts')}<ArrowRight className="h-[18px] w-[18px] transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden="true" />
               </Link>
-              <FeatureLink to="/orcamento-3d" className={btnSecondary}>
-                <Upload className="h-[18px] w-[18px] text-primary" strokeWidth={1.8} aria-hidden="true" />{t('ctaQuote')}
-              </FeatureLink>
+              <Link to="/contatos" className={btnSecondary}>
+                <MessageCircle className="h-[18px] w-[18px] text-primary" strokeWidth={1.8} aria-hidden="true" />{t('ctaQuote')}
+              </Link>
             </div>
           </motion.div>
           <motion.div {...appear(1)}>
             <MediaImage
-              k="banner-crie" alt={t('heroAlt')} eager className="aspect-[4/3] rounded-[24px] bg-brand-alt"
-              fallback={<LayerArt Icon={Layers} size="lg" />}
+              src="/images/moni/bolo-floral.webp" alt={t('heroAlt')} eager imgClassName="object-contain p-6 sm:p-10"
+              className="aspect-[4/3] rounded-[24px] bg-[radial-gradient(circle_at_50%_60%,hsl(var(--brand-orange-soft)),hsl(var(--brand-alt))_70%)]"
+              fallback={<LayerArt Icon={CakeSlice} size="lg" />}
             />
           </motion.div>
         </div>
@@ -159,7 +159,7 @@ const About = () => {
       </section>
 
       {/* Como fazemos */}
-      <section id="impressao-3d" className="scroll-mt-28 border-y border-border bg-white py-14 md:py-20" aria-labelledby="about-process">
+      <section id="como-fazemos" className="scroll-mt-28 border-y border-border bg-white py-14 md:py-20" aria-labelledby="about-process">
         <div className="shell">
           <motion.div {...reveal()} className="max-w-2xl">
             <p className={eyebrow}>{t('processEyebrow')}</p>
@@ -231,12 +231,9 @@ const About = () => {
               <Link to="/produtos" className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[14px] bg-white px-6 text-[15px] font-semibold text-brand-ink transition-transform duration-150 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-primary">
                 {t('ctaProducts')}<ArrowRight className="h-[18px] w-[18px]" aria-hidden="true" />
               </Link>
-              <FeatureLink to="/orcamento-3d" className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[14px] border border-white/45 px-6 text-[15px] font-semibold text-white transition-colors duration-150 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
-                <Upload className="h-[18px] w-[18px]" aria-hidden="true" />{t('ctaQuote')}
-              </FeatureLink>
-              <FeatureLink to="/personalizar" className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[14px] border border-white/45 px-6 text-[15px] font-semibold text-white transition-colors duration-150 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
+              <Link to="/categoria/bolos-personalizados" className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-[14px] border border-white/45 px-6 text-[15px] font-semibold text-white transition-colors duration-150 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
                 <Wand2 className="h-[18px] w-[18px]" aria-hidden="true" />{t('ctaCustom')}
-              </FeatureLink>
+              </Link>
             </div>
           </div>
         </motion.div>

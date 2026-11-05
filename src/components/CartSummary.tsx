@@ -4,7 +4,7 @@
 // (showsTaxSeparately) o subtotal mostrado já leva o imposto e o total diz "IVA incluído"; no Brasil o preço já é final.
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
-import { ArrowRight, Layers, Lock, RotateCcw, ShieldCheck, type LucideIcon } from "lucide-react";
+import { ArrowRight, ChefHat, Lock, RotateCcw, ShieldCheck, type LucideIcon } from "lucide-react";
 import CouponReveal from "@/components/cart/CouponReveal";
 import { useCheckoutPage } from "@/hooks/useCheckoutPage";
 import { useFreeShippingGoal } from "@/components/CartPromoMeta";
@@ -63,7 +63,7 @@ function Row({ label, value, tone = "muted" }: { label: React.ReactNode; value: 
 
 const TRUST: Array<{ Icon: LucideIcon; title: "trustSecure" | "trustMade" | "trustReturns"; text: "trustSecureText" | "trustMadeText" | "trustReturnsText"; href?: string }> = [
   { Icon: ShieldCheck, title: "trustSecure", text: "trustSecureText" },
-  { Icon: Layers, title: "trustMade", text: "trustMadeText" },
+  { Icon: ChefHat, title: "trustMade", text: "trustMadeText" },
   { Icon: RotateCcw, title: "trustReturns", text: "trustReturnsText", href: "/devolucoes" },
 ];
 
