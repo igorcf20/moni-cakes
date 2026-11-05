@@ -1,0 +1,66 @@
+// Textos do vale-presente no checkout (src/components/GiftCardInput.tsx) e no resumo do pedido.
+// e_<código> = erro de check_gift_card (src/hooks/useGiftCards.ts). Sem emojis nem travessões.
+import { defineMessages } from './index';
+
+const ptBR = {
+  have: 'Tem um vale-presente?',
+  label: 'Vale-presente',
+  placeholder: 'Código do vale',
+  apply: 'Usar',
+  applied: 'Vale-presente final {tail}',
+  using: 'Usando {amount} de {balance}',
+  remove: 'Remover vale-presente',
+  summary: 'Vale-presente final {tail}',
+  e_gift_card_login: 'Entre na sua conta para usar um vale-presente.',
+  e_gift_card_disabled: 'Esta loja não aceita vale-presente agora.',
+  e_gift_card_too_many: 'Muitas tentativas. Espere alguns minutos e tente de novo.',
+  e_gift_card_invalid: 'Vale-presente inválido, expirado ou sem saldo.',
+  e_error: 'Não foi possível conferir o vale. Tente novamente.',
+};
+
+export const giftCardsMessages = defineMessages({
+  'pt-BR': ptBR,
+  'pt-PT': {
+    ...ptBR,
+    have: 'Tem um vale de oferta?',
+    label: 'Vale de oferta',
+    applied: 'Vale de oferta final {tail}',
+    using: 'A usar {amount} de {balance}',
+    remove: 'Remover vale de oferta',
+    summary: 'Vale de oferta final {tail}',
+    e_gift_card_login: 'Inicie sessão para usar um vale de oferta.',
+    e_gift_card_disabled: 'Esta loja não aceita vales de oferta agora.',
+    e_gift_card_too_many: 'Demasiadas tentativas. Aguarde alguns minutos e tente novamente.',
+    e_gift_card_invalid: 'Vale de oferta inválido, expirado ou sem saldo.',
+  },
+  en: {
+    have: 'Have a gift card?',
+    label: 'Gift card',
+    placeholder: 'Gift card code',
+    apply: 'Use',
+    applied: 'Gift card ending {tail}',
+    using: 'Using {amount} of {balance}',
+    remove: 'Remove gift card',
+    summary: 'Gift card ending {tail}',
+    e_gift_card_login: 'Sign in to use a gift card.',
+    e_gift_card_disabled: 'This store does not accept gift cards right now.',
+    e_gift_card_too_many: 'Too many attempts. Wait a few minutes and try again.',
+    e_gift_card_invalid: 'Invalid, expired or empty gift card.',
+    e_error: 'Could not check the gift card. Please try again.',
+  },
+  es: {
+    have: '¿Tiene una tarjeta regalo?',
+    label: 'Tarjeta regalo',
+    placeholder: 'Código de la tarjeta',
+    apply: 'Usar',
+    applied: 'Tarjeta regalo terminada en {tail}',
+    using: 'Usando {amount} de {balance}',
+    remove: 'Quitar tarjeta regalo',
+    summary: 'Tarjeta regalo terminada en {tail}',
+    e_gift_card_login: 'Inicie sesión para usar una tarjeta regalo.',
+    e_gift_card_disabled: 'Esta tienda no acepta tarjetas regalo ahora.',
+    e_gift_card_too_many: 'Demasiados intentos. Espere unos minutos e inténtelo de nuevo.',
+    e_gift_card_invalid: 'Tarjeta regalo no válida, caducada o sin saldo.',
+    e_error: 'No se pudo comprobar la tarjeta. Inténtelo de nuevo.',
+  },
+});

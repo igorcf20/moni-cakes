@@ -1,0 +1,1 @@
+UPDATE public.products SET promo_active = true WHERE slug = 't-shirt-dogo-premium';

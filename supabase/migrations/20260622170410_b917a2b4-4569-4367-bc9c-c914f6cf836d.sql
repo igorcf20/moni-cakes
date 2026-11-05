@@ -1,0 +1,1 @@
+ALTER TABLE public.order_designs ADD COLUMN IF NOT EXISTS pdf_path TEXT NULL;

@@ -1,0 +1,9 @@
+[Unit]
+Description=Sincroniza a Loja 3D com o GitHub de 2 em 2 minutos
+
+[Timer]
+OnBootSec=2min
+OnUnitInactiveSec=2min
+
+[Install]
+WantedBy=timers.target

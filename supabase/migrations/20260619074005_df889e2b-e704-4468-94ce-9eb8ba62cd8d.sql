@@ -1,0 +1,1 @@
+ALTER TABLE public.banners ADD COLUMN IF NOT EXISTS side_image_url TEXT, ADD COLUMN IF NOT EXISTS show_side_image BOOLEAN NOT NULL DEFAULT true;

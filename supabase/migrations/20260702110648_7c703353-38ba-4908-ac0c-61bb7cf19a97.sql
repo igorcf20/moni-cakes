@@ -1,0 +1,2 @@
+DELETE FROM public.wishlist w WHERE NOT EXISTS (SELECT 1 FROM public.products p WHERE p.id = w.product_id);
+ALTER TABLE public.wishlist ADD CONSTRAINT wishlist_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id) ON DELETE CASCADE;

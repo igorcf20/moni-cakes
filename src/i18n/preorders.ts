@@ -1,0 +1,63 @@
+// Textos da pré-venda no site (página do produto, cartões, carrinho, checkout e pedidos). Sem emojis nem travessões.
+import { defineMessages } from './index';
+
+const ptBR = {
+  badge: 'Pré-venda',
+  title: 'Produto em pré-venda',
+  ships_from: 'Envio previsto a partir de {date}',
+  ships_soon: 'Envio assim que o produto estiver disponível',
+  text: 'Você garante o seu agora e paga normalmente. Enviamos assim que ele chegar.',
+  remaining_one: 'Resta 1 unidade na pré-venda',
+  remaining_other: 'Restam {count} unidades na pré-venda',
+  sold_out: 'As unidades da pré-venda acabaram',
+  button: 'Comprar na pré-venda',
+  chip: 'Pré-venda',
+  chip_date: 'Pré-venda, envio a partir de {date}',
+  order_note: 'Seu pedido tem item de pré-venda: tudo é enviado junto quando ele estiver disponível.',
+};
+
+export const preordersMessages = defineMessages({
+  'pt-BR': ptBR,
+  'pt-PT': {
+    badge: 'Pré-venda',
+    title: 'Produto em pré-venda',
+    ships_from: 'Envio previsto a partir de {date}',
+    ships_soon: 'Envio assim que o produto estiver disponível',
+    text: 'Garanta já o seu e pague normalmente. Enviamos assim que chegar.',
+    remaining_one: 'Resta 1 unidade na pré-venda',
+    remaining_other: 'Restam {count} unidades na pré-venda',
+    sold_out: 'As unidades da pré-venda esgotaram',
+    button: 'Comprar na pré-venda',
+    chip: 'Pré-venda',
+    chip_date: 'Pré-venda, envio a partir de {date}',
+    order_note: 'A sua encomenda tem um artigo em pré-venda: tudo é enviado junto quando estiver disponível.',
+  },
+  en: {
+    badge: 'Pre-order',
+    title: 'Pre-order product',
+    ships_from: 'Expected to ship from {date}',
+    ships_soon: 'Ships as soon as the product is available',
+    text: 'Secure yours now and pay as usual. We ship as soon as it arrives.',
+    remaining_one: '1 unit left in the pre-order',
+    remaining_other: '{count} units left in the pre-order',
+    sold_out: 'The pre-order units are gone',
+    button: 'Pre-order now',
+    chip: 'Pre-order',
+    chip_date: 'Pre-order, ships from {date}',
+    order_note: 'Your order has a pre-order item: everything ships together once it is available.',
+  },
+  es: {
+    badge: 'Preventa',
+    title: 'Producto en preventa',
+    ships_from: 'Envío previsto a partir del {date}',
+    ships_soon: 'Envío en cuanto el producto esté disponible',
+    text: 'Asegura el tuyo ahora y paga como siempre. Lo enviamos en cuanto llegue.',
+    remaining_one: 'Queda 1 unidad en la preventa',
+    remaining_other: 'Quedan {count} unidades en la preventa',
+    sold_out: 'Las unidades de la preventa se agotaron',
+    button: 'Comprar en preventa',
+    chip: 'Preventa',
+    chip_date: 'Preventa, envío a partir del {date}',
+    order_note: 'Tu pedido tiene un artículo en preventa: todo se envía junto cuando esté disponible.',
+  },
+});

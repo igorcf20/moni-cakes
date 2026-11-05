@@ -1,0 +1,1 @@
+ALTER TABLE public.product_variation_size_availability ADD COLUMN IF NOT EXISTS price_modifier numeric NOT NULL DEFAULT 0;

@@ -1,0 +1,12 @@
+[Unit]
+Description=Cópia de segurança diária da Loja 3D (base de dados e ficheiros enviados)
+Documentation=file://%h/loja3d/src/deploy/backup.sh
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/env bash %h/loja3d/src/deploy/backup.sh
+# Prioridade baixa no anfitrião (o pg_dump e o tar dentro dos contentores também correm com nice/ionice).
+Nice=19
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+TimeoutStartSec=4h

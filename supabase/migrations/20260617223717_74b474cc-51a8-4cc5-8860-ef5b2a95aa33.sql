@@ -1,0 +1,1 @@
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS inner_margin_mm numeric DEFAULT 5;

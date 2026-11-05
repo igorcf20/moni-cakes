@@ -1,0 +1,16 @@
+# Um só grupo para todos os robôs: grupos próprios (Googlebot, Bingbot...) ignorariam os bloqueios abaixo.
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /shop-kodeadmin
+Disallow: /checkout
+Disallow: /carrinho
+Disallow: /dashboard
+Disallow: /minhas-compras
+Disallow: /favoritos
+Disallow: /pedido/
+Disallow: /pagamento/
+Disallow: /prototipo
+
+# Endereço público da loja (mudar aqui se o domínio mudar). O sitemap é gerado pela função sitemap.
+Sitemap: https://loja3d.kodemi.pt/sitemap.xml

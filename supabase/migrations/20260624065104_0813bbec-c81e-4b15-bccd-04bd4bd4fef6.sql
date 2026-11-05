@@ -1,0 +1,1 @@
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS recommended_dtf_id text REFERENCES public.products(id) ON DELETE SET NULL;

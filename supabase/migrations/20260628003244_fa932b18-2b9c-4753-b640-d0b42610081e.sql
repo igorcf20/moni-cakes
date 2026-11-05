@@ -1,0 +1,1 @@
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS requires_customer_config boolean NOT NULL DEFAULT false;

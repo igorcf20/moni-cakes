@@ -1,0 +1,1 @@
+UPDATE public.products SET stock_quantity = 999 WHERE customizable = true AND stock_quantity = 0 AND is_active = true;

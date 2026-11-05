@@ -1,0 +1,60 @@
+# Configuração das Edge Functions da Loja 3D (servidor próprio, sem projeto na Supabase cloud).
+# Lida ao arrancar pelo router deploy/functions/main/index.ts (serviço "functions" do deploy/compose.yaml),
+# que a relê quando o ficheiro muda. Só usa as secções [functions.<nome>] com:
+#   verify_jwt = false  a função aceita pedidos sem JWT (por omissão exige um JWT válido: chave anon ou sessão);
+#   enabled = false     a função responde 503 sem arrancar.
+# Formato compatível com o Supabase CLI; project_id é só um nome (o CLI não é usado).
+project_id = "loja3d"
+
+# Viva calls this endpoint without a Supabase JWT. Every event is re-verified
+# against the Viva API inside the function, so it is safe to expose.
+[functions.viva-webhook]
+verify_jwt = false
+
+# Avisos do Mercado Pago, Stripe e PayPal (sem JWT). Cada aviso é confirmado na API do provedor
+# antes de mudar o pedido (supabase/functions/_shared/payments/service.ts).
+[functions.payment-webhook]
+verify_jwt = false
+
+# Called hourly by pg_cron without a user session; the function itself requires an admin
+# session or the x-cron-secret header (CRON_SECRET).
+[functions.ctt-track]
+verify_jwt = false
+
+# Sitemap público (motores de busca, sem JWT). Só lê produtos e categorias ativos.
+[functions.sitemap]
+verify_jwt = false
+
+# Feed de produtos (Google Merchant Center, Meta, TikTok, Pinterest), sem JWT. Só com o recurso product_feed ligado;
+# só lê produtos ativos (os mesmos dados públicos do site).
+[functions.product-feed]
+verify_jwt = false
+
+# Taxas do BCE: aceita o cron diário (x-cron-secret ou "Authorization: Bearer <CRON_SECRET>") além da sessão de
+# admin; a própria função recusa tudo o resto (403).
+[functions.update-exchange-rates]
+verify_jwt = false
+
+# Funções feitas para os serviços da Lovable (e-mail e IA), que este servidor não usa.
+# Respondem 503 com mensagem clara até haver um substituto (ex.: envio por SMTP).
+# O site trata a falha sem bloquear: o pedido e a mensagem de contacto ficam gravados, só o e-mail não sai.
+[functions.auth-email-hook]
+enabled = false
+
+[functions.handle-email-suppression]
+enabled = false
+
+[functions.preview-transactional-email]
+enabled = false
+
+[functions.process-email-queue]
+enabled = false
+
+[functions.send-transactional-email]
+enabled = false
+
+[functions.process-image]
+enabled = false
+
+[functions.punchout]
+verify_jwt = false
