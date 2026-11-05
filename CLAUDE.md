@@ -474,8 +474,8 @@ que a loja faz, `docs/MEMORIA.md` se o dono decidiu algo novo, `docs/GUIA-VISUAL
 - Moni Cakes: fotos reais dos bolos; número de WhatsApp e redes no Admin; textos reais do preparo e da página Sobre;
   categorias do cardápio (o menu padrão `src/lib/catalog.ts`, os textos de `src/i18n/layout.ts` e as fotos de
   `src/lib/media.ts` ainda são da loja 3D até haver categorias no Admin); desligar no Admin os recursos de 3D
-  (Orçamento 3D, personalizador). Publicação: `deploy/` pronto para monicakes.kodemi.pt; falta o dono juntar o PR no
-  `main`, criar o registo DNS A `monicakes` e correr `deploy/PASSO-A-PASSO.md` no VPS.
+  (Orçamento 3D, personalizador). Loja online em https://monicakes.kodemi.pt desde 5/11/2026 (HTTPS, sync e cópias
+  diárias ligados); falta o primeiro administrador e o dono preencher os dados da loja no Admin.
 
 - O site da empresa em `kodemi.pt` nunca é tocado: só subdomínios (a loja-modelo PRINT3D está em loja3d.kodemi.pt).
 - E-mails: as funções de e-mail dependiam da Lovable e estão desligadas (`enabled = false`, 503). Falta SMTP e uma
