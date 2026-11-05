@@ -21,10 +21,11 @@ com as preferências gerais do dono, ficou em `docs/legado-print3d/MEMORIA.md`.
 - Fotografias reais dos bolos (com fundo transparente) para substituir as imagens provisórias.
 - Canal de encomendas: número de WhatsApp (Admin) e Instagram.
 - Textos reais sobre o preparo (seção O Sabor em Cada Detalhe) e a página Sobre.
-- Publicação: o dono junta o PR no `main`, cria o registo DNS A `monicakes` -> 62.129.141.82 e segue `deploy/PASSO-A-PASSO.md`.
+- Primeiro administrador (e-mail da conta do dono) e dados da loja no Admin.
 - Categorias do cardápio (o menu padrão do código ainda é o da loja 3D até haver categorias no Admin).
 
 ## Linha do tempo
 
 - 5/11/2026: base copiada da loja3d, marca Moni Cakes aplicada e página inicial cinematográfica (PR inicial).
 - 5/11/2026: hero revisto a pedido do dono, página de detalhe do bolo e `deploy/` adaptado para monicakes.kodemi.pt.
+- 5/11/2026: loja publicada em https://monicakes.kodemi.pt (VPS 62.129.141.82, ao lado da loja3d), a pedido do dono.
