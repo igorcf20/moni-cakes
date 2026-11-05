@@ -8,6 +8,7 @@ import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import gsap from 'gsap';
 import { useMessages } from '@/i18n';
 import { moniHomeMessages } from '@/i18n/moniHome';
+import { useBrand } from '@/hooks/useBrand';
 import { HERO_CAKES, HIGHLIGHTS, PETALS, type HeroCake, type Layer } from '@/lib/moniHome';
 
 const reduceMotion = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -45,6 +46,7 @@ export function MoniHero({ active, onSelect, order }: {
   order: { href: string; external: boolean };
 }) {
   const { t } = useMessages(moniHomeMessages);
+  const brand = useBrand();
   const stage = useRef<HTMLDivElement>(null);
   const section = useRef<HTMLElement>(null);
   const title = useRef<HTMLHeadingElement>(null);
@@ -100,11 +102,13 @@ export function MoniHero({ active, onSelect, order }: {
     ? <a href={order.href} target="_blank" rel="noopener noreferrer" className={className}>{children}</a>
     : <Link to={order.href} className={className}>{children}</Link>;
 
+  const pad = (n: number) => String(n).padStart(2, '0');
+
   return (
     <section ref={section} className="mc-hero" data-mc-hero aria-labelledby="mc-hero-title">
       <div className="mc-hero__bg" data-mc-bg />
       <div className="mc-hero__light" data-mc-light />
-      <div className="mc-hero__floor" />
+      <div className="mc-hero__floor" aria-hidden="true" />
       {/* Maré creme: sobe com a rolagem (cena 2) e liga o hero ao catálogo sem corte. */}
       <div className="mc-hero__tide" data-mc-cream aria-hidden="true">
         <svg viewBox="0 0 1440 110" preserveAspectRatio="none"><path fill="currentColor" d="M0,62 C180,20 360,96 560,70 C760,44 900,6 1100,30 C1260,50 1360,84 1440,70 L1440,110 L0,110 Z" /></svg>
@@ -116,60 +120,64 @@ export function MoniHero({ active, onSelect, order }: {
           width={p.size} height={p.size} style={{ left: `${p.left}%`, top: `${p.top}%`, width: p.size, transform: `rotate(${p.rot}deg)` }} />
       ))}
 
-      <div className="relative z-[4] mx-auto flex min-h-[100svh] max-w-[1440px] flex-col px-4 pb-16 pt-[88px] sm:px-6 lg:px-12 lg:pb-[110px] lg:pt-[110px]">
+      <div className="mc-hero__frame">
+        {/* Título monumental atrás dos bolos: o topo da composição cobre a base das letras (sobreposição controlada). */}
         <h1 ref={title} id="mc-hero-title" className="mc-title mc-display" data-mc-title>
           <span className="mc-line"><span data-mc-word>{t('heroTitleA')}</span></span>{' '}
           <span className="mc-line"><span data-mc-word>{t('heroTitleB')}</span></span>
         </h1>
 
-        <div className="relative mt-2 grid flex-1 items-end gap-6 lg:-mt-[3vw] lg:grid-cols-[minmax(240px,1fr)_auto_minmax(280px,1fr)] lg:items-center lg:gap-4">
-          {/* Coluna esquerda (no celular vai para baixo do bolo) */}
-          <div className="order-3 max-w-[360px] lg:order-1 lg:self-start lg:pt-[6vh]" data-mc-side="left">
-            <p className="hidden border-l border-[#fff5e9]/50 pl-6 text-[19px] leading-[1.55] text-[#fff5e9]/95 lg:block mc-serif" data-mc-side-item>
-              {t('heroLead')}
-            </p>
-            <p className="text-[17px] leading-snug text-[#fff5e9]/95 lg:hidden" data-mc-side-item>{t('heroLeadShort')}</p>
-            <a href="#nossos-bolos" className="mc-side-link mt-6 lg:ml-6" data-mc-side-item>
-              {t('heroLink')} <ArrowRight className="h-5 w-5" strokeWidth={1.7} aria-hidden="true" />
-            </a>
-            <div className="mt-10 hidden pl-6 lg:block" data-mc-side-item>
-              <div data-mc-caption aria-live="polite">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#f6d3a6]">{t('sampleNote')}</p>
-                <p className="mc-serif mt-2 text-[24px] leading-tight text-[#fff5e9]">{t(cake.name)}</p>
-                <p className="mt-1 max-w-[250px] text-[14px] leading-snug text-[#fff5e9]/80">{t(cake.text)}</p>
-              </div>
-            </div>
+        {/* Centro: composição dos bolos sobre a superfície do estúdio */}
+        <div className="mc-hero__stagewrap" data-mc-stage-wrap>
+          <div ref={stage} className="mc-stage" data-mc-stage>
+            {HERO_CAKES.map((c, i) => <Scene key={c.id} cake={c} active={i === active} eager={i === 0} />)}
+            <svg className="mc-badge" viewBox="0 0 120 120" aria-hidden="true" data-mc-badge>
+              <defs><path id="mc-badge-path" d="M60,60 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0" /></defs>
+              <circle cx="60" cy="60" r="58" className="mc-badge__disc" />
+              <text><textPath href="#mc-badge-path" startOffset="0" textLength="286" lengthAdjust="spacing">{t('heroBadge', { store: brand.name })}</textPath></text>
+              <path d="M60 47l3 10 10 3-10 3-3 10-3-10-10-3 10-3z" className="mc-badge__icon" />
+            </svg>
           </div>
+        </div>
 
-          {/* Centro: composição dos bolos */}
-          <div className="order-1 flex justify-center lg:order-2" data-mc-stage-wrap>
-            <div ref={stage} className="mc-stage" data-mc-stage>
-              {HERO_CAKES.map((c, i) => <Scene key={c.id} cake={c} active={i === active} eager={i === 0} />)}
-            </div>
-          </div>
+        {/* Esquerda: texto editorial (no celular, versão curta depois do seletor) */}
+        <div className="mc-hero__left" data-mc-side="left">
+          <p className="mc-hero__lead mc-serif" data-mc-side-item>
+            <span className="hidden lg:inline">{t('heroLead')}</span>
+            <span className="lg:hidden">{t('heroLeadShort')}</span>
+          </p>
+          <a href="#nossos-bolos" className="mc-side-link mt-5" data-mc-side-item>
+            {t('heroLink')} <ArrowRight className="h-5 w-5" strokeWidth={1.7} aria-hidden="true" />
+          </a>
+        </div>
 
-          {/* Coluna direita: destaques do catálogo */}
-          <ul className="order-4 hidden flex-col gap-5 lg:order-3 lg:flex lg:justify-self-end" aria-label={t('highlightsAria')} data-mc-side="right">
-            {HIGHLIGHTS.map((h) => (
-              <li key={h.title} data-mc-side-item>
-                <Link to={h.href} className="mc-hl" aria-label={t('hlDetails', { name: t(h.title) })}>
-                  <span className="mc-hl__img"><img src={h.img} alt="" width={96} height={96} loading="lazy" /></span>
-                  <span>
-                    <span className="mc-serif block text-[22px] leading-tight text-[#fff5e9]">{t(h.title)}</span>
-                    <span className="mt-1 block max-w-[210px] text-[14px] leading-snug text-[#fff5e9]/80">{t(h.text)}</span>
-                  </span>
-                  <ArrowRight className="h-5 w-5 text-[#fbd9c0]" strokeWidth={1.6} aria-hidden="true" />
-                </Link>
-              </li>
-            ))}
-          </ul>
+        {/* Direita: destaques do catálogo */}
+        <ul className="mc-hero__right" aria-label={t('highlightsAria')} data-mc-side="right">
+          {HIGHLIGHTS.map((h) => (
+            <li key={h.title} data-mc-side-item>
+              <Link to={h.href} className="mc-hl" aria-label={t('hlDetails', { name: t(h.title) })}>
+                <span className="mc-hl__img"><img src={h.img} alt="" width={96} height={96} loading="lazy" /></span>
+                <span className="min-w-0">
+                  <span className="mc-serif block text-[19px] leading-tight text-[#fff5e9] lg:text-[21px]">{t(h.title)}</span>
+                  <span className="mt-1 hidden max-w-[200px] text-[13.5px] leading-snug text-[#fff5e9]/75 lg:block">{t(h.text)}</span>
+                </span>
+                <ArrowRight className="h-5 w-5 text-[#fbd9c0]" strokeWidth={1.6} aria-hidden="true" />
+              </Link>
+            </li>
+          ))}
+        </ul>
 
-          {/* Seletor + nome e descrição do bolo em destaque */}
-          <div className="order-2 flex flex-col items-center gap-3 lg:order-4 lg:col-span-3 lg:-mt-4" data-mc-picker>
-            <div className="text-center lg:hidden" data-mc-caption>
-              <p className="mc-serif text-[22px] leading-tight text-[#fff5e9] lg:text-[24px]">{t(cake.name)}</p>
-              <p className="mx-auto mt-1 max-w-[340px] text-[14px] leading-snug text-[#fff5e9]/80">{t(cake.text)}</p>
-              <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-[#fff5e9]/55">{t('sampleNote')}</p>
+        {/* Barra flutuante: nome e descrição do bolo em destaque + miniaturas */}
+        <div className="mc-hero__dockwrap" data-mc-picker>
+          <div className="mc-dock">
+            <div className="mc-dock__caption" data-mc-caption aria-live="polite">
+              <span className="mc-dock__index mc-serif" aria-hidden="true">{pad(active + 1)}<small>/{pad(HERO_CAKES.length)}</small></span>
+              <span className="min-w-0">
+                <span className="block text-[10.5px] font-semibold uppercase tracking-[0.24em] text-[#f6d3a6]">{t('sampleNote')}</span>
+                <span className="mc-serif mt-0.5 block text-[21px] leading-tight text-[#fff5e9]">{t(cake.name)}</span>
+                <span className="mc-dock__text mt-0.5 block text-[13px] leading-snug text-[#fff5e9]/75">{t(cake.text)}</span>
+                <Link to={cake.href} className="mc-dock__more">{t('cakeDetails')} <ArrowRight className="h-4 w-4" strokeWidth={1.7} aria-hidden="true" /></Link>
+              </span>
             </div>
             <div className="mc-picker" role="group" aria-label={t('pickerAria')}>
               <button type="button" className="mc-picker__arrow hidden sm:grid" onClick={() => go(-1)} aria-label={t('pickerPrev')}>
@@ -185,22 +193,13 @@ export function MoniHero({ active, onSelect, order }: {
                 <ChevronRight className="h-5 w-5" strokeWidth={1.8} />
               </button>
             </div>
-            <OrderLink className="mc-btn mc-btn--coral mt-2 lg:hidden">{t('orderCta')}</OrderLink>
           </div>
-
-          {/* Destaques no celular e tablet: lista simples abaixo do texto */}
-          <ul className="order-5 grid gap-2 sm:grid-cols-3 lg:hidden" aria-label={t('highlightsAria')}>
-            {HIGHLIGHTS.map((h) => (
-              <li key={h.title}>
-                <Link to={h.href} className="flex items-center gap-3 rounded-2xl bg-[#fff5e9]/10 p-2 pr-3 ring-1 ring-[#fff5e9]/20">
-                  <span className="mc-hl__img !h-14 !w-14"><img src={h.img} alt="" width={96} height={96} loading="lazy" /></span>
-                  <span className="mc-serif text-[18px] leading-tight text-[#fff5e9]">{t(h.title)}</span>
-                  <ArrowRight className="ml-auto h-4 w-4 text-[#fbd9c0]" strokeWidth={1.6} aria-hidden="true" />
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div className="mt-4 lg:hidden"><OrderLink className="mc-btn mc-btn--coral">{t('orderCta')}</OrderLink></div>
         </div>
+
+        <a href="#nossos-bolos" className="mc-hero__scroll" data-mc-side-item>
+          <span className="mc-hero__scroll-line" aria-hidden="true" />{t('scrollHint')}
+        </a>
       </div>
 
       <svg className="mc-hero__wave" viewBox="0 0 1440 110" preserveAspectRatio="none" aria-hidden="true">

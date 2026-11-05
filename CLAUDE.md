@@ -351,7 +351,9 @@ que a loja faz, `docs/MEMORIA.md` se o dono decidiu algo novo, `docs/GUIA-VISUAL
   clip-path). Nossos Bolos = `useHomeCatalog().featured` (sem produtos: cartões "Em breve" sem preço). Banners,
   kits e enquetes do Admin entram depois da narrativa. Encomenda = WhatsApp do Admin ou `/contatos`.
   Nada pode deixar `transform` num antepassado da página (quebra o pin e os elementos fixos): por isso
-  `.animate-page-in` usa `backwards`.
+  `.animate-page-in` usa `backwards`. Canal de encomenda: `useMoniOrder()`.
+- Detalhe do bolo (`/produto/:id`): `ProductDetail` com `MoniHeader variant="solid"`, classe `.moni-pdp` (foto
+  `[data-pdp-photo]` em estúdio) e `MoniCakeOrder` (como encomendar + convite) entre a compra e os detalhes.
 
 ### Marca e tema (modelo de loja)
 - Nada de marca fixa no código: nome, logos, cores, fontes, ícone da aba e descrição vêm de `useBrand()` /

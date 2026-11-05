@@ -191,7 +191,7 @@ export function ProductGallery({ images, name, resetKey, FallbackIcon = Box, bad
     <>
       <section aria-label={t('gallery')} onKeyDown={onKeyDown} className={cn('flex flex-col gap-3 lg:grid lg:gap-4', total > 1 && 'lg:grid-cols-[84px_minmax(0,1fr)]')}>
         {/* Foto principal */}
-        <div className="group relative order-1 aspect-square overflow-hidden rounded-[24px] border border-brand-card-border bg-white lg:order-2">
+        <div data-pdp-photo className="group relative order-1 aspect-square overflow-hidden rounded-[24px] border border-brand-card-border bg-white lg:order-2">
           {current.kind === 'model' ? <ModelView url={current.url} name={name} /> : current.kind === 'video' ? (
             <video key={current.url} src={current.url} controls playsInline preload="metadata" aria-label={t('videoLabel', { name })} className="absolute inset-0 h-full w-full bg-brand-ink object-contain" />
           ) : (

@@ -16,11 +16,10 @@ import { useFeature } from '@/hooks/useFeatures';
 import '@/components/moni/moni.css';
 import { useBrand } from '@/hooks/useBrand';
 import { useHomeCatalog } from '@/hooks/useHomeCatalog';
-import { useVisualSettings } from '@/hooks/useVisualSettings';
 import { useMessages } from '@/i18n';
 import { layoutMessages } from '@/i18n/layout';
 import { moniHomeMessages } from '@/i18n/moniHome';
-import { orderHref } from '@/lib/moniHome';
+import { useMoniOrder } from '@/components/moni/useMoniOrder';
 
 const Index = () => {
   const { t } = useMessages(moniHomeMessages);
@@ -30,9 +29,7 @@ const Index = () => {
   const [active, setActive] = useState(0);
   const catalog = useHomeCatalog();
   const kitsOn = useFeature('kits');
-  const { data: visual } = useVisualSettings();
-  const wa = visual?.plugins?.whatsapp;
-  const order = orderHref(wa?.enabled === false ? '' : wa?.phone, wa?.message || tl('waMessage'));
+  const { order, whatsHref } = useMoniOrder();
   // As animações de rolagem só arrancam depois de o catálogo decidir a altura de Nossos Bolos.
   useMoniMotion(root, !catalog.isLoading);
 
@@ -43,7 +40,7 @@ const Index = () => {
         <meta name="description" content={brand.description} />
         <link rel="preload" as="image" href="/images/moni/bolo-floral.webp" />
       </Helmet>
-      <MoniHeader order={order} whatsHref={order.external ? order.href : null} />
+      <MoniHeader order={order} whatsHref={whatsHref} />
       <main id="conteudo">
         <MoniHero active={active} onSelect={setActive} order={order} />
         <OurCakes products={catalog.featured} loading={catalog.isLoading} order={order} />

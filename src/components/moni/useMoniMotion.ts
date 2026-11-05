@@ -51,6 +51,7 @@ export function useMoniMotion(root: RefObject<HTMLElement>, ready: boolean) {
           .from(decoLayers, { autoAlpha: 0, y: 30, scale: 0.92, duration: 0.8, stagger: 0.07 }, 0.85)
           .from(petals, { autoAlpha: 0, scale: 0.6, rotation: '-=40', duration: 0.9, stagger: 0.06 }, 1.05)
           .from(sideItems, { autoAlpha: 0, y: 18, duration: 0.6, stagger: 0.07 }, 1.2)
+          .from(q(hero, '[data-mc-badge]'), { autoAlpha: 0, duration: 0.9 }, 1.4)
           .from(q(hero, '[data-mc-picker]'), { autoAlpha: 0, y: 24, duration: 0.6 }, 1.6);
 
         // Movimento ambiente: pétalas a flutuar devagar, cada uma no seu ritmo.
@@ -91,8 +92,9 @@ export function useMoniMotion(root: RefObject<HTMLElement>, ready: boolean) {
             .to(q(hero, '[data-mc-side="left"]'), { autoAlpha: 0, x: -40, duration: 0.6 }, 0.1)
             .to(q(hero, '[data-mc-side="right"]'), { autoAlpha: 0, x: 40, duration: 0.6 }, 0.1)
             .to(q(hero, '[data-mc-picker]'), { autoAlpha: 0, y: 30, duration: 0.5 }, 0.15)
+            .to(q(hero, '.mc-hero__scroll, [data-mc-badge]'), { autoAlpha: 0, duration: 0.4 }, 0.1)
             // Cena 2: o rosa vira creme, o título apaga e o bolo sobe e abre espaço.
-            .fromTo(q(hero, '[data-mc-cream]'), { yPercent: 100 }, { yPercent: 52, duration: 0.8 }, 0.7)
+            .fromTo(q(hero, '[data-mc-cream]'), { y: 0, yPercent: 100 }, { y: 0, yPercent: 52, duration: 0.8 }, 0.7)
             .to(q(hero, '[data-mc-title]'), { autoAlpha: 0, duration: 0.5 }, 0.8)
             .to(stage, { scale: 0.94, yPercent: -16, duration: 0.8 }, 1.0)
             .to(petals, { autoAlpha: 0, duration: 0.4 }, 1.0);

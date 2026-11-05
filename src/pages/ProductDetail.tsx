@@ -17,7 +17,10 @@ import { Helmet } from 'react-helmet';
 import { motion, MotionConfig } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { AlertCircle, ArrowRight, Box, ChevronRight, Clock, FileDown, Heart, Info, Leaf, PackageSearch, Printer, RefreshCw, Repeat, RotateCcw, ShieldCheck, ShoppingBag, Truck } from 'lucide-react';
-import Header from '@/components/Header';
+import { MoniHeader } from '@/components/moni/MoniHeader';
+import { MoniCakeOrder } from '@/components/moni/MoniCakeOrder';
+import { useMoniOrder } from '@/components/moni/useMoniOrder';
+import '@/components/moni/moni.css';
 import Footer from '@/components/Footer';
 import PromoCountdown from '@/components/PromoCountdown';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -99,12 +102,14 @@ function matchCategory(category: string | null | undefined, menu: MenuCategory[]
   return menu.find((c) => c.slug === n) ?? menu.find((c) => same(c.labels) || c.subs.some((s) => same(s.labels))) ?? null;
 }
 
+// Moni Cakes: o detalhe do bolo usa o cabeçalho da marca (faixa rosa) e o estilo .moni-pdp de src/components/moni/moni.css.
 function PageShell({ children, buySpacer = false, desktopBar = false }: { children: ReactNode; buySpacer?: boolean; desktopBar?: boolean }) {
+  const { order, whatsHref } = useMoniOrder();
   return (
     <MotionConfig reducedMotion="user">
-      <div className="flex min-h-screen flex-col bg-background">
-        <Header />
-        <main className="flex-1">{children}</main>
+      <div className="moni-home moni-pdp flex min-h-screen flex-col">
+        <MoniHeader variant="solid" current="/produtos" order={order} whatsHref={whatsHref} />
+        <main id="conteudo" className="mc-cream-tex flex-1">{children}</main>
         <Footer />
         {/* espaço para a barra fixa de compra (celular e tablet) */}
         {buySpacer && <div className={cn('h-[72px]', desktopBar ? 'lg:h-[84px]' : 'lg:hidden')} aria-hidden="true" />}
@@ -157,6 +162,7 @@ function ProductView({ product, options, optionsLoading, optionsError }: {
   const { t: tsub } = useMessages(subscriptionsMessages);
   const { data: storeInfo } = useStoreInfo();
   const rating = useProductRating(product.id);
+  const { order: moniOrder } = useMoniOrder();
 
   // ?cor=<id da cor>&tamanho=<id do tamanho> (links do feed de produtos): a variante já vem escolhida.
   const [colorKey, setColorKey] = useState<string | null>(() => { const v = new URLSearchParams(location.search).get('cor'); return v ? `v:${v}` : null; });
@@ -554,7 +560,8 @@ function ProductView({ product, options, optionsLoading, optionsError }: {
                 <span><span className="sr-only">{tc('brand_by')}: </span>{brand.name}</span>
               </Link>
             )}
-            <h1 className="text-[30px] leading-[1.06] [text-wrap:balance] sm:text-[34px] lg:text-[36px] xl:text-[40px]">{product.name}</h1>
+            {categoryLabel && <p className="mc-pdp-eyebrow">{categoryLabel}</p>}
+            <h1 className="mc-pdp-title text-[38px] leading-[1.02] [text-wrap:balance] sm:text-[44px] xl:text-[54px]">{product.name}</h1>
 
             {rating.count > 0 && (
               <a href="#avaliacoes" onClick={openReviews} className="group mt-2 inline-flex min-h-[44px] items-center gap-2 text-sm text-brand-ink-soft transition-colors duration-150 hover:text-brand-orange-text">
@@ -717,6 +724,8 @@ function ProductView({ product, options, optionsLoading, optionsError }: {
             {pp.trust.on && <ProductTrust rows={trustRows} style={pp.trust.style} payments={pp.trust.payments} className={pp.trust.style === 'card' ? 'mt-6' : 'mt-7'} />}
           </motion.div>
         </div>
+
+        <MoniCakeOrder order={moniOrder} />
 
         <div className="mt-14 md:mt-20">
           <ProductDetailsTabs ref={detailsRef} product={product} tab={tab} onTab={setTab} reviewsCount={rating.count} returnPath={location.pathname} sku={variantsOn ? shownSku : product.sku} layout={pp.details} />

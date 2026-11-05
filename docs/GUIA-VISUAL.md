@@ -34,10 +34,12 @@ O guia da loja-modelo (PRINT3D) ficou em `docs/legado-print3d/GUIA-VISUAL.md` s�
 Código: `src/pages/Index.tsx`, `src/components/moni/*` (`MoniHeader`, `MoniHero`, `MoniSections`, `useMoniMotion`,
 `moni.css`), dados e imagens em `src/lib/moniHome.ts`, textos em `src/i18n/moniHome.ts` (4 idiomas).
 
-1. **Hero** (100vh): degradê rosa antigo, coral e pêssego com luz central e superfície de estúdio; título monumental
-   (cabe sempre na largura, em qualquer idioma); composição de bolos em camadas (`HERO_CAKES`: bolo principal,
-   secundários, fatia, rosas, morango, pétalas); texto editorial e nome do bolo em destaque à esquerda; três destaques
-   à direita; seletor flutuante de três bolos. Celular: composição própria (título em duas linhas, bolo ao centro,
+1. **Hero** (100vh, revisto a 5/11/2026 a pedido do dono): degradê rosa antigo, coral e pêssego com luz de estúdio
+   atrás dos bolos e chão claro a partir da linha do horizonte; título monumental numa linha (cabe sempre na largura,
+   letras em degradê creme para rosa-claro) **atrás** da composição: o topo do bolo principal cobre a base das letras;
+   palco grande, calculado para essa sobreposição em qualquer altura de ecrã; composição em camadas (`HERO_CAKES`);
+   selo redondo que gira devagar ("Feito à mão"); texto editorial à esquerda; três destaques à direita; barra
+   flutuante em vidro com número, nome do bolo, "Ver detalhes" e miniaturas; "Role para descobrir" à direita. Celular: composição própria (título em duas linhas, bolo ao centro,
    miniaturas em carrossel, botão de encomenda, destaques em lista).
 2. **Rolagem**: o hero fica fixo; título sobe, bolo cresce, decoração em velocidades diferentes, luz muda, textos
    laterais somem; uma maré creme sobe e liga o hero a **Nossos Bolos** (título por máscara, cartões em sequência).
@@ -48,6 +50,15 @@ Código: `src/pages/Index.tsx`, `src/components/moni/*` (`MoniHeader`, `MoniHero
 Movimento com GSAP + ScrollTrigger (sem Lenis: rolagem nativa). Só transform, opacity e clip-path. Com
 "reduzir movimento" nada se anima; sem JavaScript tudo fica visível. No celular não há pin, só revelações leves.
 O botão de encomenda vai para o WhatsApp configurado no Admin (Aparência > WhatsApp); sem número, para `/contatos`.
+
+## Detalhe do bolo (`/produto/:id`)
+
+Mesmo motor da página de produto (`src/pages/ProductDetail.tsx`: tamanhos, preço, carrinho, prazos, avaliações),
+com a pele da marca: cabeçalho `MoniHeader variant="solid"` (faixa rosa), fundo creme texturizado, foto principal
+em "estúdio" (degradê rosa-claro, imagem inteira com sombra; ideal para fotos com fundo transparente), categoria em
+dourado acima do nome em Cormorant grande. Depois da compra: **Como encomendar** (três passos) e o convite **Quer
+algo só seu?** com botão para o canal de pedidos (`src/components/moni/MoniCakeOrder.tsx`). Estilos `.moni-pdp` em
+`moni.css`.
 
 ## Fotografia
 

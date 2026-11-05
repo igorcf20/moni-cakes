@@ -92,9 +92,9 @@ const Footer = () => {
 
   const linkCls = "text-[15px] text-white/60 transition-colors duration-150 [@media(hover:hover)]:hover:text-white";
   const columns = [
-    { title: t("col_buy"), links: [[t("link_new"), "/produtos?ordem=novidades"], [t("link_best"), "/produtos?ordem=mais-vendidos"], [t("link_offers"), "/produtos?promo=1"], [t("link_custom"), "/personalizar"], [t("link_kits"), "/kits"]].filter(([, href]) => hrefOn(href) && (href !== "/kits" || kitSettings.footerLink)) },
+    { title: t("col_buy"), links: [[t("link_new"), "/produtos?ordem=novidades"], [t("link_best"), "/produtos?ordem=mais-vendidos"], [t("link_offers"), "/produtos?promo=1"], [t("link_custom"), "/contatos"], [t("link_kits"), "/kits"]].filter(([, href]) => hrefOn(href) && (href !== "/kits" || kitSettings.footerLink)) },
     { title: t("col_help"), links: [[t("link_faq"), "/faq"], [t("link_shipping"), "/faq#envios"], [t("link_returns"), "/devolucoes"], [t("link_contact"), "/contatos"]] },
-    { title: t("col_about"), links: [[t("link_story"), "/sobre"], [t("link_reviews"), "/avaliacoes"], [t("link_blog"), "/blog"], [t("link_polls"), "/enquetes"], [t("link_forum"), "/forum"], [t("link_3d"), "/sobre#impressao-3d"], [t("link_materials"), "/sobre#materiais"], [t("link_sustain"), "/sobre#sustentabilidade"]].filter(([, href]) => hrefOn(href)) },
+    { title: t("col_about"), links: [[t("link_story"), "/sobre"], [t("link_reviews"), "/avaliacoes"], [t("link_blog"), "/blog"], [t("link_polls"), "/enquetes"], [t("link_forum"), "/forum"]].filter(([, href]) => hrefOn(href)) },
   ];
 
   return (

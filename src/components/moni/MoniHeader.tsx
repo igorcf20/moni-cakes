@@ -40,7 +40,14 @@ function useCartCount() {
 
 export type NavItem = { label: string; href: string };
 
-export function MoniHeader({ order, whatsHref }: { order: { href: string; external: boolean }; whatsHref: string | null }) {
+/** overlay = sobre o hero da página inicial; solid = faixa rosa no topo das outras páginas (ex.: detalhe do bolo). */
+export function MoniHeader({ order, whatsHref, variant = 'overlay', current = '/' }: {
+  order: { href: string; external: boolean };
+  whatsHref: string | null;
+  variant?: 'overlay' | 'solid';
+  /** item do menu marcado como página atual */
+  current?: string;
+}) {
   const { t } = useMessages(moniHomeMessages);
   const brand = useBrand();
   const cartCount = useCartCount();
@@ -57,14 +64,14 @@ export function MoniHeader({ order, whatsHref }: { order: { href: string; extern
   const NavLink = ({ item, onClick }: { item: NavItem; onClick?: () => void }) =>
     item.href.startsWith('#')
       ? <a href={item.href} onClick={onClick}>{item.label}</a>
-      : <Link to={item.href} onClick={onClick} aria-current={item.href === '/' ? 'page' : undefined}>{item.label}</Link>;
+      : <Link to={item.href} onClick={onClick} aria-current={item.href === current ? 'page' : undefined}>{item.label}</Link>;
 
   const OrderButton = ({ className = '' }: { className?: string }) => order.external
     ? <a href={order.href} target="_blank" rel="noopener noreferrer" className={`mc-btn mc-btn--coral ${className}`}><ShoppingBag className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />{t('orderCta')}</a>
     : <Link to={order.href} className={`mc-btn mc-btn--coral ${className}`}><ShoppingBag className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />{t('orderCta')}</Link>;
 
   return (
-    <header className="mc-header" data-mc-header>
+    <header className={`mc-header${variant === 'solid' ? ' mc-header--solid' : ''}`} data-mc-header>
       <a href="#conteudo" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-background focus:px-4 focus:py-2 focus:text-foreground">{t('skip')}</a>
       <div className="mx-auto flex h-[76px] max-w-[1440px] items-center gap-4 px-4 sm:px-6 lg:h-[104px] lg:px-12">
         <Link to="/" className="shrink-0" aria-label={brand.name}>
@@ -90,7 +97,7 @@ export function MoniHeader({ order, whatsHref }: { order: { href: string; extern
               <span className="absolute right-0.5 top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#fff5e9] px-1 text-[11px] font-bold text-primary">{cartCount}</span>
             )}
           </Link>
-          <OrderButton className="ml-2 hidden lg:inline-flex" />
+          <span className="ml-2 hidden lg:block"><OrderButton /></span>
           <button type="button" className="mc-icon-btn grid lg:hidden" aria-expanded={open} aria-controls="mc-mobile-nav"
             aria-label={open ? t('menuClose') : t('menuOpen')} onClick={() => setOpen((v) => !v)}>
             {open ? <X className="h-6 w-6" strokeWidth={1.7} /> : <Menu className="h-6 w-6" strokeWidth={1.7} />}
