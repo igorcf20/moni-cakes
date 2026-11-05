@@ -345,7 +345,6 @@ html body .moni-home .mc-serif.mc-serif {
 .mc-nav a:hover::after, .mc-nav a[aria-current='page']::after { transform: scaleX(1); }
 .mc-icon-btn {
   position: relative;
-  display: grid;
   place-items: center;
   width: 42px;
   height: 42px;

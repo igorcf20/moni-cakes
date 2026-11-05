@@ -77,21 +77,21 @@ export function MoniHeader({ order, whatsHref }: { order: { href: string; extern
         </nav>
         <div className="ml-auto flex items-center gap-1 lg:ml-0 lg:gap-2">
           {whatsHref && (
-            <a href={whatsHref} target="_blank" rel="noopener noreferrer" className="mc-icon-btn" aria-label={t('whatsAria')}>
+            <a href={whatsHref} target="_blank" rel="noopener noreferrer" className="mc-icon-btn grid" aria-label={t('whatsAria')}>
               <WhatsIcon className="h-[22px] w-[22px]" />
             </a>
           )}
           <Link to="/dashboard" className="mc-icon-btn hidden sm:grid" aria-label={t('accountAria')}>
             <User className="h-[21px] w-[21px]" strokeWidth={1.7} />
           </Link>
-          <Link to="/carrinho" className="mc-icon-btn" aria-label={t('cartAria', { count: cartCount })}>
+          <Link to="/carrinho" className="mc-icon-btn grid" aria-label={t('cartAria', { count: cartCount })}>
             <ShoppingBag className="h-[21px] w-[21px]" strokeWidth={1.7} />
             {cartCount > 0 && (
               <span className="absolute right-0.5 top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#fff5e9] px-1 text-[11px] font-bold text-primary">{cartCount}</span>
             )}
           </Link>
           <OrderButton className="ml-2 hidden lg:inline-flex" />
-          <button type="button" className="mc-icon-btn lg:hidden" aria-expanded={open} aria-controls="mc-mobile-nav"
+          <button type="button" className="mc-icon-btn grid lg:hidden" aria-expanded={open} aria-controls="mc-mobile-nav"
             aria-label={open ? t('menuClose') : t('menuOpen')} onClick={() => setOpen((v) => !v)}>
             {open ? <X className="h-6 w-6" strokeWidth={1.7} /> : <Menu className="h-6 w-6" strokeWidth={1.7} />}
           </button>
