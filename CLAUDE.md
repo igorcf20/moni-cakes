@@ -347,8 +347,8 @@ que a loja faz, `docs/MEMORIA.md` se o dono decidiu algo novo, `docs/GUIA-VISUAL
   `Footer`): `src/components/moni/` (`MoniHero`, `MoniSections`, `useMoniMotion`, `moni.css` com classes `mc-*` sob
   `.moni-home`), dados e imagens em `src/lib/moniHome.ts` (`HERO_CAKES` = cenas em camadas com posição em % do palco,
   `HIGHLIGHTS`, `PETALS`, `SAMPLE_CARDS`, `orderHref`), textos em `src/i18n/moniHome.ts`. Movimento só com GSAP +
-  ScrollTrigger (`gsap.matchMedia`: nada com reduzir movimento; pin só a partir de 1024px; transform, opacity e
-  clip-path). Nossos Bolos = `useHomeCatalog().featured` (sem produtos: cartões "Em breve" sem preço). Banners,
+  ScrollTrigger (`gsap.matchMedia` com condição `always`; pin só a partir de 1024px; abaixo disso `scrollReveals`: cada bloco
+  surge preso à rolagem (scrub); com reduzir movimento, só opacidade; transform, opacity e clip-path). Nossos Bolos = `useHomeCatalog().featured` (sem produtos: cartões "Em breve" sem preço). Banners,
   kits e enquetes do Admin entram depois da narrativa. Encomenda = WhatsApp do Admin ou `/contatos`.
   Nada pode deixar `transform` num antepassado da página (quebra o pin e os elementos fixos): por isso
   `.animate-page-in` usa `backwards`. Canal de encomenda: `useMoniOrder()`.

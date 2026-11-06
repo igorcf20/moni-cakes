@@ -147,79 +147,124 @@ export function useMoniMotion(root: RefObject<HTMLElement>, ready: boolean) {
     const el = root.current;
     if (!el || !ready) return;
     const mm = gsap.matchMedia(el);
-    mm.add({ motion: '(prefers-reduced-motion: no-preference)', desktop: '(min-width: 1024px)' }, (ctx) => {
+    // "always": o gsap.matchMedia só chama a função quando alguma condição é verdadeira; sem ela, um celular com
+    // "reduzir movimento" não teria nenhuma e ficaria sem as entradas suaves.
+    mm.add({ always: 'all', motion: '(prefers-reduced-motion: no-preference)', desktop: '(min-width: 1024px)' }, (ctx) => {
       const { motion, desktop } = ctx.conditions as Record<string, boolean>;
-      if (!motion) return;
-        // Nossos Bolos: título por máscara e cartões em sequência.
-        const cakes = el.querySelector('[data-mc-cakes]');
-        if (cakes) {
-          gsap.from(q(cakes, '[data-mc-reveal-line]'), { yPercent: 110, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: cakes, start: 'top 75%' } });
-          if (desktop) {
-            gsap.from(q(cakes, '[data-mc-fade]'), { autoAlpha: 0, y: 16, duration: 0.7, stagger: 0.1, ease: 'power2.out', scrollTrigger: { trigger: cakes, start: 'top 70%' } });
-          } else {
-            q(cakes, '[data-mc-fade]').forEach((node) => gsap.from(node, { autoAlpha: 0, y: 16, duration: 0.7, ease: 'power2.out', scrollTrigger: { trigger: node, start: 'top 90%' } }));
-          }
-          const cards = q(cakes, '[data-mc-card]');
-          if (desktop) {
-            gsap.from(cards, { autoAlpha: 0, y: 60, scale: 0.97, duration: 0.9, stagger: 0.12, ease: 'power3.out', scrollTrigger: { trigger: q(cakes, '[data-mc-cards]')[0] ?? cakes, start: 'top 80%' } });
-          } else {
-            // No celular os cartões ficam empilhados: cada um entra quando chega ao ecrã.
-            cards.forEach((card) => gsap.from(card, { autoAlpha: 0, y: 50, scale: 0.96, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: card, start: 'top 88%' } }));
-          }
-        }
-
-        // ---------- Cena 3: a fatia aproxima-se e os passos aparecem ----------
-        const detail = el.querySelector<HTMLElement>('[data-mc-detail]');
-        if (detail) {
-          const steps = q(detail, '[data-mc-step]');
-          gsap.from(q(detail, '[data-mc-reveal-line]'), { yPercent: 110, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: detail, start: 'top 70%' } });
-          gsap.from(q(detail, '[data-mc-fade]'), { autoAlpha: 0, y: 16, duration: 0.6, scrollTrigger: { trigger: detail, start: 'top 70%' } });
-          if (desktop) {
-            const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: detail, start: 'top top', end: '+=120%', pin: true, scrub: 0.6 } });
-            tl.fromTo(q(detail, '[data-mc-detail-zoom]'), { scale: 1 }, { scale: 1.35, duration: 3 }, 0);
-            steps.forEach((s, i) => {
-              tl.from(s, { autoAlpha: 0, y: 40, duration: 0.6, ease: 'power2.out' }, 0.3 + i * 0.85);
-              const line = q(detail, '[data-mc-detail-line]')[i];
-              const mark = q(detail, '[data-mc-detail-mark]')[i];
-              if (mark) tl.from(mark, { autoAlpha: 0, duration: 0.4 }, 0.3 + i * 0.85);
-              if (line) tl.from(line, { scaleX: 0, duration: 0.5 }, 0.35 + i * 0.85);
-            });
-          } else {
-            gsap.fromTo(q(detail, '[data-mc-detail-zoom]'), { scale: 1 }, { scale: 1.15, ease: 'none', scrollTrigger: { trigger: detail, start: 'top bottom', end: 'bottom top', scrub: true } });
-            steps.forEach((s) => gsap.from(s, { autoAlpha: 0, y: 30, duration: 0.7, ease: 'power2.out', scrollTrigger: { trigger: s, start: 'top 85%' } }));
-          }
-        }
-
-        // ---------- Cena 4: painel por máscara, câmera simulada e parallax ----------
-        const celebrate = el.querySelector<HTMLElement>('[data-mc-celebrate]');
-        if (celebrate) {
-          const panel = celebrate.querySelector('[data-mc-celebrate-panel]');
-          const st = { trigger: celebrate, start: 'top 85%', end: 'top 15%', scrub: 0.6 };
-          gsap.fromTo(panel, { clipPath: desktop ? 'inset(10% 16% 10% 16% round 48px)' : 'inset(6% 6% 6% 6% round 40px)' },
-            { clipPath: 'inset(0% 0% 0% 0% round 32px)', ease: 'none', scrollTrigger: st });
-          gsap.fromTo(q(celebrate, '[data-mc-celebrate-camera]'), { scale: 1.18, xPercent: -2 }, { scale: 1, xPercent: 0, ease: 'none', scrollTrigger: { ...st, end: 'bottom 40%' } });
-          gsap.from(q(celebrate, '[data-mc-celebrate-text]'), { autoAlpha: 0, y: 30, duration: 0.8, stagger: 0.12, ease: 'power3.out', scrollTrigger: { trigger: celebrate, start: 'top 45%' } });
-        }
-
-        // Parallax das flores e pétalas soltas das seções (data-mc-depth).
-        q(el, '[data-mc-depth]').forEach((node) => {
-          const d = Number(node.dataset.mcDepth ?? 1);
-          gsap.fromTo(node, { y: 50 * d }, { y: -50 * d, rotation: d * 6, ease: 'none',
-            scrollTrigger: { trigger: node.closest('section') ?? node, start: 'top bottom', end: 'bottom top', scrub: true } });
-        });
-
-        // ---------- Cena 5: convite final ----------
-        const final = el.querySelector<HTMLElement>('[data-mc-final]');
-        if (final) {
-          gsap.from(q(final, '[data-mc-reveal-line]'), { yPercent: 110, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: final, start: 'top 70%' } });
-          gsap.from(q(final, '[data-mc-fade]'), { autoAlpha: 0, y: 18, duration: 0.7, stagger: 0.12, ease: 'power2.out', scrollTrigger: { trigger: final, start: 'top 65%' } });
-          gsap.from(q(final, '[data-mc-final-cake]'), { autoAlpha: 0, y: 60, scale: 1.08, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: final, start: 'top 70%' } });
-        }
-
+      if (desktop && motion) desktopScenes(el);
+      else scrollReveals(el, motion);
       ScrollTrigger.refresh();
       const stop = refreshOnResize(el);
       ctx.add(() => stop);
     });
     return () => mm.revert();
   }, [root, ready]);
+}
+
+/**
+ * Celular e tablet (e qualquer ecrã com "reduzir movimento"): cada bloco surge acompanhando o dedo. A animação
+ * está presa à posição da rolagem (scrub), não ao relógio: rolar devagar revela devagar, voltar para cima desfaz.
+ * Com "reduzir movimento" fica só a opacidade, sem deslocamentos nem zoom.
+ */
+function scrollReveals(el: HTMLElement, motion: boolean) {
+  const reveal = (node: Element, from: gsap.TweenVars, start = 'top 96%', end = 'top 64%') =>
+    gsap.fromTo(node, { autoAlpha: 0, ...(motion ? from : {}) }, {
+      autoAlpha: 1, ...(motion ? { x: 0, y: 0, scale: 1, rotation: 0 } : {}), ease: 'none',
+      scrollTrigger: { trigger: node, start, end, scrub: 0.5 },
+    });
+  const sections = q(el, '[data-mc-cakes], [data-mc-detail], [data-mc-celebrate], [data-mc-final]');
+
+  // Títulos por máscara: cada linha sobe de dentro da sua faixa enquanto se rola.
+  sections.forEach((sec) => q(sec, '[data-mc-reveal-line]').forEach((line) => {
+    gsap.fromTo(line, motion ? { yPercent: 110 } : { autoAlpha: 0 }, {
+      ...(motion ? { yPercent: 0 } : { autoAlpha: 1 }), ease: 'none',
+      scrollTrigger: { trigger: line.parentElement ?? line, start: 'top 94%', end: 'top 70%', scrub: 0.5 },
+    });
+  }));
+  // Textos curtos, passos e textos do painel.
+  sections.forEach((sec) => q(sec, '[data-mc-fade], [data-mc-step], [data-mc-celebrate-text]').forEach((n) => reveal(n, { y: 34 })));
+
+  // Cartões de Nossos Bolos: o cartão sobe e a foto abre de dentro (máscara + leve zoom), um a um.
+  q(el, '[data-mc-card]').forEach((card, i) => {
+    reveal(card, { y: 70, scale: 0.94, x: i % 2 ? 14 : -14 }, 'top 98%', 'top 58%');
+    if (!motion) return;
+    const img = card.querySelector('img');
+    if (img) gsap.fromTo(img, { scale: 1.18 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: card, start: 'top 98%', end: 'top 40%', scrub: 0.5 } });
+  });
+
+  if (motion) {
+    // Fatia em detalhe: aproxima enquanto a seção passa.
+    q(el, '[data-mc-detail-zoom]').forEach((n) => gsap.fromTo(n, { scale: 1 }, { scale: 1.15, ease: 'none',
+      scrollTrigger: { trigger: n.closest('[data-mc-detail]') ?? n, start: 'top bottom', end: 'bottom top', scrub: true } }));
+    // Painel da celebração: abre por máscara e a "câmera" recua.
+    const celebrate = el.querySelector<HTMLElement>('[data-mc-celebrate]');
+    if (celebrate) {
+      const st = { trigger: celebrate, start: 'top 90%', end: 'top 20%', scrub: 0.5 };
+      gsap.fromTo(celebrate.querySelector('[data-mc-celebrate-panel]'), { clipPath: 'inset(8% 8% 8% 8% round 40px)' },
+        { clipPath: 'inset(0% 0% 0% 0% round 32px)', ease: 'none', scrollTrigger: st });
+      gsap.fromTo(q(celebrate, '[data-mc-celebrate-camera]'), { scale: 1.18 }, { scale: 1, ease: 'none', scrollTrigger: { ...st, end: 'bottom 40%' } });
+    }
+    // Bolo do convite final sobe e assenta.
+    q(el, '[data-mc-final-cake]').forEach((n) => reveal(n, { y: 80, scale: 1.08 }, 'top 95%', 'top 55%'));
+    // Flores e pétalas soltas em velocidades diferentes.
+    q(el, '[data-mc-depth]').forEach((node) => {
+      const d = Number(node.dataset.mcDepth ?? 1);
+      gsap.fromTo(node, { y: 40 * d }, { y: -40 * d, rotation: d * 6, ease: 'none',
+        scrollTrigger: { trigger: node.closest('section') ?? node, start: 'top bottom', end: 'bottom top', scrub: true } });
+    });
+  } else {
+    q(el, '[data-mc-final-cake]').forEach((n) => reveal(n, {}));
+  }
+}
+
+/** Computador com movimento: cenas fixas (pin) e entradas em sequência. */
+function desktopScenes(el: HTMLElement) {
+  // Nossos Bolos: título por máscara e cartões em sequência.
+  const cakes = el.querySelector('[data-mc-cakes]');
+  if (cakes) {
+    gsap.from(q(cakes, '[data-mc-reveal-line]'), { yPercent: 110, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: cakes, start: 'top 75%' } });
+    gsap.from(q(cakes, '[data-mc-fade]'), { autoAlpha: 0, y: 16, duration: 0.7, stagger: 0.1, ease: 'power2.out', scrollTrigger: { trigger: cakes, start: 'top 70%' } });
+    gsap.from(q(cakes, '[data-mc-card]'), { autoAlpha: 0, y: 60, scale: 0.97, duration: 0.9, stagger: 0.12, ease: 'power3.out', scrollTrigger: { trigger: q(cakes, '[data-mc-cards]')[0] ?? cakes, start: 'top 80%' } });
+  }
+
+  // ---------- Cena 3: a fatia aproxima-se e os passos aparecem ----------
+  const detail = el.querySelector<HTMLElement>('[data-mc-detail]');
+  if (detail) {
+    gsap.from(q(detail, '[data-mc-reveal-line]'), { yPercent: 110, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: detail, start: 'top 70%' } });
+    gsap.from(q(detail, '[data-mc-fade]'), { autoAlpha: 0, y: 16, duration: 0.6, scrollTrigger: { trigger: detail, start: 'top 70%' } });
+    const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: detail, start: 'top top', end: '+=120%', pin: true, scrub: 0.6 } });
+    tl.fromTo(q(detail, '[data-mc-detail-zoom]'), { scale: 1 }, { scale: 1.35, duration: 3 }, 0);
+    q(detail, '[data-mc-step]').forEach((s, i) => {
+      tl.from(s, { autoAlpha: 0, y: 40, duration: 0.6, ease: 'power2.out' }, 0.3 + i * 0.85);
+      const line = q(detail, '[data-mc-detail-line]')[i];
+      const mark = q(detail, '[data-mc-detail-mark]')[i];
+      if (mark) tl.from(mark, { autoAlpha: 0, duration: 0.4 }, 0.3 + i * 0.85);
+      if (line) tl.from(line, { scaleX: 0, duration: 0.5 }, 0.35 + i * 0.85);
+    });
+  }
+
+  // ---------- Cena 4: painel por máscara, câmera simulada e parallax ----------
+  const celebrate = el.querySelector<HTMLElement>('[data-mc-celebrate]');
+  if (celebrate) {
+    const st = { trigger: celebrate, start: 'top 85%', end: 'top 15%', scrub: 0.6 };
+    gsap.fromTo(celebrate.querySelector('[data-mc-celebrate-panel]'), { clipPath: 'inset(10% 16% 10% 16% round 48px)' },
+      { clipPath: 'inset(0% 0% 0% 0% round 32px)', ease: 'none', scrollTrigger: st });
+    gsap.fromTo(q(celebrate, '[data-mc-celebrate-camera]'), { scale: 1.18, xPercent: -2 }, { scale: 1, xPercent: 0, ease: 'none', scrollTrigger: { ...st, end: 'bottom 40%' } });
+    gsap.from(q(celebrate, '[data-mc-celebrate-text]'), { autoAlpha: 0, y: 30, duration: 0.8, stagger: 0.12, ease: 'power3.out', scrollTrigger: { trigger: celebrate, start: 'top 45%' } });
+  }
+
+  // Parallax das flores e pétalas soltas das seções (data-mc-depth).
+  q(el, '[data-mc-depth]').forEach((node) => {
+    const d = Number(node.dataset.mcDepth ?? 1);
+    gsap.fromTo(node, { y: 50 * d }, { y: -50 * d, rotation: d * 6, ease: 'none',
+      scrollTrigger: { trigger: node.closest('section') ?? node, start: 'top bottom', end: 'bottom top', scrub: true } });
+  });
+
+  // ---------- Cena 5: convite final ----------
+  const final = el.querySelector<HTMLElement>('[data-mc-final]');
+  if (final) {
+    gsap.from(q(final, '[data-mc-reveal-line]'), { yPercent: 110, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: final, start: 'top 70%' } });
+    gsap.from(q(final, '[data-mc-fade]'), { autoAlpha: 0, y: 18, duration: 0.7, stagger: 0.12, ease: 'power2.out', scrollTrigger: { trigger: final, start: 'top 65%' } });
+    gsap.from(q(final, '[data-mc-final-cake]'), { autoAlpha: 0, y: 60, scale: 1.08, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: final, start: 'top 70%' } });
+  }
 }
