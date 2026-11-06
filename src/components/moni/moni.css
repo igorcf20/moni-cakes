@@ -217,7 +217,6 @@ html body .moni-home .mc-serif.mc-serif {
   color: var(--mc-gold-soft);
   transition: gap 200ms var(--mc-ease), color 200ms;
 }
-.mc-dock__more:hover { gap: 10px; color: #fff1dc; }
 .mc-hero__scroll { display: none; }
 
 @media (min-width: 1024px) {
@@ -306,7 +305,6 @@ html body .moni-home .mc-serif.mc-serif {
   font-weight: 600;
   transition: gap 200ms var(--mc-ease), color 200ms;
 }
-.mc-side-link:hover { gap: 0.9rem; color: #fff1dc; }
 
 .mc-hl {
   display: grid;
@@ -317,7 +315,7 @@ html body .moni-home .mc-serif.mc-serif {
   border-radius: 999px 18px 18px 999px;
   transition: background-color 200ms, transform 200ms var(--mc-ease);
 }
-.mc-hl:hover, .mc-hl:focus-visible { background: rgba(255, 240, 230, 0.12); transform: translateX(-4px); }
+.mc-hl:focus-visible { background: rgba(255, 240, 230, 0.12); transform: translateX(-4px); }
 .mc-hl__img {
   width: 76px;
   height: 76px;
@@ -350,7 +348,6 @@ html body .moni-home .mc-serif.mc-serif {
   transition: background-color 250ms, transform 250ms var(--mc-ease), box-shadow 250ms;
 }
 .mc-picker__btn img { width: 74%; height: auto; transition: transform 300ms var(--mc-ease); }
-.mc-picker__btn:hover img { transform: translateY(-3px) scale(1.04); }
 .mc-picker__btn[aria-pressed='true'] {
   background: linear-gradient(180deg, rgba(255, 238, 230, 0.95), rgba(250, 210, 205, 0.9));
   box-shadow: 0 12px 26px -12px rgba(70, 20, 30, 0.6);
@@ -365,7 +362,6 @@ html body .moni-home .mc-serif.mc-serif {
   color: #fff5e9;
   transition: background-color 200ms;
 }
-.mc-picker__arrow:hover { background: rgba(255, 240, 230, 0.18); }
 
 .mc-btn {
   position: relative;
@@ -381,11 +377,8 @@ html body .moni-home .mc-serif.mc-serif {
   transition: transform 220ms var(--mc-ease), box-shadow 220ms, background-color 220ms;
 }
 .mc-btn--coral { background: var(--mc-coral); color: #fff; box-shadow: 0 10px 24px -12px rgba(120, 30, 40, 0.7); }
-.mc-btn--coral:hover { background: #df6763; }
 .mc-btn--rose { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); box-shadow: 0 14px 30px -14px rgba(120, 30, 50, 0.7); }
-.mc-btn--rose:hover { background: hsl(var(--primary-hover)); }
 .mc-btn--ghost { border: 1px solid currentColor; color: inherit; background: transparent; }
-.mc-btn--ghost:hover { background: rgba(255, 255, 255, 0.4); }
 /* Microinteração: brilho que atravessa o botão e leve elevação */
 .mc-btn::after {
   content: '';
@@ -395,11 +388,7 @@ html body .moni-home .mc-serif.mc-serif {
   transform: translateX(-120%);
   transition: transform 700ms var(--mc-ease);
 }
-.mc-btn:hover { transform: translateY(-2px); }
-.mc-btn:hover::after { transform: translateX(120%); }
-.mc-btn:active { transform: translateY(0) scale(0.98); }
 .mc-btn .mc-btn__arrow { transition: transform 220ms var(--mc-ease); }
-.mc-btn:hover .mc-btn__arrow { transform: translateX(4px); }
 
 /* ---------- Seções seguintes ---------- */
 .mc-cream-tex {
@@ -433,7 +422,6 @@ html body .moni-home .mc-serif.mc-serif {
   overflow: hidden;
   transition: transform 300ms var(--mc-ease), box-shadow 300ms;
 }
-.mc-card:hover { transform: translateY(-6px); box-shadow: 0 30px 50px -28px rgba(90, 40, 30, 0.4); }
 .mc-card__photo {
   position: relative;
   aspect-ratio: 4 / 3.4;
@@ -443,7 +431,6 @@ html body .moni-home .mc-serif.mc-serif {
   overflow: hidden;
 }
 .mc-card__photo img { transition: transform 600ms var(--mc-ease); }
-.mc-card:hover .mc-card__photo img { transform: scale(1.06); }
 
 .mc-detail { background: linear-gradient(180deg, var(--mc-cream), #fbe6dc); }
 .mc-detail__frame {
@@ -458,7 +445,7 @@ html body .moni-home .mc-serif.mc-serif {
   position: relative;
   border-radius: 32px;
   overflow: hidden;
-  min-height: min(82vh, 760px);
+  min-height: min(82svh, 760px);
   background: linear-gradient(120deg, #7f3c50 0%, var(--mc-hero-b) 45%, #e39a8e 100%);
   color: #fff5e9;
   clip-path: inset(0 0 0 0 round 32px);
@@ -577,8 +564,7 @@ html body .moni-pdp h1.mc-pdp-title {
   transform-origin: left;
   transition: transform 250ms var(--mc-ease);
 }
-.mc-nav a:hover { color: var(--mc-gold-soft); }
-.mc-nav a:hover::after, .mc-nav a[aria-current='page']::after { transform: scaleX(1); }
+.mc-nav a[aria-current='page']::after { transform: scaleX(1); }
 .mc-icon-btn {
   position: relative;
   place-items: center;
@@ -587,16 +573,78 @@ html body .moni-pdp h1.mc-pdp-title {
   border-radius: 50%;
   transition: background-color 200ms;
 }
-.mc-icon-btn:hover { background: rgba(255, 240, 230, 0.16); }
 
-/* Mobile: carrossel horizontal das miniaturas */
+/* Celular e tablet: composição própria, não o computador encolhido */
 @media (max-width: 1023px) {
   .mc-hero__right .mc-hl { grid-template-columns: 52px 1fr 18px; gap: 12px; background: rgba(255, 245, 233, 0.1); box-shadow: inset 0 0 0 1px rgba(255, 245, 233, 0.2); }
   .mc-hero__right .mc-hl__img { width: 52px; height: 52px; }
   .mc-picker { overflow-x: auto; scroll-snap-type: x mandatory; max-width: 100%; }
   .mc-picker__btn { scroll-snap-align: center; flex: 0 0 auto; width: 84px; height: 68px; }
-  .mc-title { white-space: normal; font-size: clamp(52px, 17vw, 132px); line-height: 0.88; }
+  .mc-title { white-space: normal; font-size: clamp(52px, 17vw, 132px); line-height: 0.88; filter: none; }
+
+  /* O hero é mais alto que o ecrã: a luz fica no bolo (--mc-cake-y) e, daí para baixo, o fundo escurece para o rosa
+     profundo em vez de clarear para o pêssego, onde o texto creme do seletor, do convite e da lista não se lia. */
+  .mc-hero { --mc-cake-y: calc(92px + 56vw); }
+  .mc-hero__bg {
+    background:
+      radial-gradient(78vw 66vw at 50% var(--mc-cake-y), rgba(255, 214, 196, 0.55), transparent 72%),
+      radial-gradient(90% 60vw at 0% 0%, rgba(232, 121, 117, 0.4), transparent 60%),
+      linear-gradient(180deg, var(--mc-hero-a) 0, var(--mc-hero-b) var(--mc-cake-y), var(--mc-rose) calc(var(--mc-cake-y) + 200px), var(--mc-hero-a) 100%);
+  }
+  .mc-hero__light { background: radial-gradient(52vw 46vw at 50% var(--mc-cake-y), rgba(255, 238, 226, 0.7), transparent 70%); }
+  .mc-hero__floor {
+    top: calc(var(--mc-cake-y) + 8vw);
+    bottom: auto;
+    height: 34vw;
+    background: radial-gradient(60% 70% at 50% 30%, rgba(255, 230, 218, 0.5), transparent 72%);
+  }
+  .mc-hero__floor::before { display: none; }
+  .mc-dock__text { color: rgba(255, 245, 233, 0.92); }
+  .mc-dock__more, .mc-side-link { color: #fbe3c4; }
+
+  /* O telemóvel é outra máquina: sem desfoque de fundo sobre uma cena em movimento; o palco tem camada própria. */
+  .mc-stage { will-change: transform; }
+  .mc-picker { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(255, 236, 228, 0.16); }
+
+  /* Título pequeno numa linha: no celular os fios laterais empurravam-no para duas. */
+  .mc-eyebrow { gap: 10px; letter-spacing: 0.2em; font-size: 11.5px; color: #8f5f26; }
+  .mc-final .mc-eyebrow { color: var(--mc-cafe); }
+  .mc-eyebrow::before, .mc-eyebrow::after { width: 18px; }
 }
+
+/* Toque: sem clarão cinzento, sem atraso de duplo toque e sem selecionar o texto dos controles */
+.moni-home a, .moni-home button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+.mc-btn, .mc-picker__btn, .mc-hl {
+  user-select: none;
+  -webkit-user-select: none;
+}
+.mc-hl:active { background: rgba(255, 240, 230, 0.16); }
+.mc-picker__btn:active { background-color: rgba(255, 240, 230, 0.2); }
+
+/* Hover só em quem tem rato: no toque, o estado ficava preso depois de tocar. */
+@media (hover: hover) and (pointer: fine) {
+  .mc-dock__more:hover { gap: 10px; color: #fff1dc; }
+  .mc-side-link:hover { gap: 0.9rem; color: #fff1dc; }
+  .mc-hl:hover { background: rgba(255, 240, 230, 0.12); transform: translateX(-4px); }
+  .mc-picker__btn:hover img { transform: translateY(-3px) scale(1.04); }
+  .mc-picker__arrow:hover { background: rgba(255, 240, 230, 0.18); }
+  .mc-btn--coral:hover { background: #df6763; }
+  .mc-btn--rose:hover { background: hsl(var(--primary-hover)); }
+  .mc-btn--ghost:hover { background: rgba(255, 255, 255, 0.4); }
+  .mc-btn:hover { transform: translateY(-2px); }
+  .mc-btn:hover::after { transform: translateX(120%); }
+  .mc-btn:hover .mc-btn__arrow { transform: translateX(4px); }
+  .mc-card:hover { transform: translateY(-6px); box-shadow: 0 30px 50px -28px rgba(90, 40, 30, 0.4); }
+  .mc-card:hover .mc-card__photo img { transform: scale(1.06); }
+  .mc-nav a:hover { color: var(--mc-gold-soft); }
+  .mc-nav a:hover::after { transform: scaleX(1); }
+  .mc-icon-btn:hover { background: rgba(255, 240, 230, 0.16); }
+}
+/* Depois do hover para ganhar dele no computador: a pressão assenta o botão. */
+.mc-btn:active { transform: translateY(0) scale(0.98); }
 
 @media (prefers-reduced-motion: reduce) {
   .mc-badge, .mc-badge__icon, .mc-hero__scroll-line::after { animation: none !important; }

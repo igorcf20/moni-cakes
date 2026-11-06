@@ -39,7 +39,7 @@ export function OurCakes({ products, loading, order }: { products: CardProduct[]
 
         {loading ? (
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {[0, 1, 2, 3].map((i) => <div key={i} className="aspect-[4/5] animate-pulse rounded-3xl bg-white/70" />)}
+            {[0, 1, 2, 3].map((i) => <div key={i} className={`aspect-[4/5] animate-pulse rounded-3xl bg-white/70${i > 1 ? ' hidden sm:block' : ''}`} />)}
           </div>
         ) : real.length > 0 ? (
           <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4" data-mc-cards>
@@ -122,7 +122,7 @@ export function FlavorDetail() {
               </span>
             ))}
           </div>
-          <p className="absolute bottom-4 left-5 text-[11px] uppercase tracking-[0.2em] text-[hsl(var(--brand-ink-soft))]/60">{t('sampleNote')}</p>
+          <p className="absolute left-5 top-4 z-[1] text-[11px] lg:bottom-4 lg:top-auto uppercase tracking-[0.2em] text-[hsl(var(--brand-ink-soft))]/60">{t('sampleNote')}</p>
         </div>
         <div>
           <p className="mc-eyebrow mc-eyebrow--left" data-mc-fade>{t('detailEyebrow')}</p>
@@ -157,8 +157,8 @@ export function Celebrate({ order }: { order: Order }) {
             className="absolute bottom-[8%] right-[40%] hidden w-[20%] max-w-[300px] drop-shadow-[0_24px_24px_rgba(60,15,25,0.3)] lg:block" style={{ zIndex: -1 }} />
         </div>
         <img src={MONI_IMG.rose1} alt="" aria-hidden="true" width={169} height={151} loading="lazy" className="absolute bottom-[6%] right-[2%] w-[16%] max-w-[180px]" data-mc-depth="1.2" />
-        <img src={MONI_IMG.petals[2]} alt="" aria-hidden="true" width={61} height={52} loading="lazy" className="absolute right-[42%] top-[14%] w-[44px]" data-mc-depth="2" />
-        <img src={MONI_IMG.petals[0]} alt="" aria-hidden="true" width={66} height={64} loading="lazy" className="absolute right-[12%] top-[22%] w-[52px]" data-mc-depth="1.6" />
+        <img src={MONI_IMG.petals[2]} alt="" aria-hidden="true" width={61} height={52} loading="lazy" className="absolute right-[46%] top-[64%] w-[44px] lg:right-[42%] lg:top-[14%]" data-mc-depth="2" />
+        <img src={MONI_IMG.petals[0]} alt="" aria-hidden="true" width={66} height={64} loading="lazy" className="absolute right-[6%] top-[56%] w-[52px] lg:right-[12%] lg:top-[22%]" data-mc-depth="1.6" />
         <div className="relative z-[2] flex min-h-[inherit] max-w-[560px] flex-col justify-center p-7 pb-[62%] sm:p-12 sm:pb-[52%] lg:p-20 lg:pb-20">
           <p className="mc-eyebrow mc-eyebrow--left !text-[#f6d3a6]" data-mc-celebrate-text>{t('celebrateEyebrow')}</p>
           <h2 id="mc-celebrate-title" className="mc-display mt-4 text-[48px] text-[#fff5e9] sm:text-[64px] lg:text-[84px]" data-mc-celebrate-text>{t('celebrateTitle')}</h2>

@@ -40,7 +40,8 @@ Código: `src/pages/Index.tsx`, `src/components/moni/*` (`MoniHeader`, `MoniHero
    palco grande, calculado para essa sobreposição em qualquer altura de ecrã; composição em camadas (`HERO_CAKES`);
    selo redondo que gira devagar ("Feito à mão"); texto editorial à esquerda; três destaques à direita; barra
    flutuante em vidro com número, nome do bolo, "Ver detalhes" e miniaturas; "Role para descobrir" à direita. Celular: composição própria (título em duas linhas, bolo ao centro,
-   miniaturas em carrossel, botão de encomenda, destaques em lista).
+   miniaturas em carrossel, botão de encomenda, destaques em lista). A luz fica no bolo e o fundo escurece para o rosa
+   profundo daí para baixo, para o texto creme se ler; o pêssego e o chão claro são só do computador.
 2. **Rolagem**: o hero fica fixo; título sobe, bolo cresce, decoração em velocidades diferentes, luz muda, textos
    laterais somem; uma maré creme sobe e liga o hero a **Nossos Bolos** (título por máscara, cartões em sequência).
 3. **O Sabor em Cada Detalhe**: fatia em primeiro plano que se aproxima; massa, recheio e cobertura aparecem um a um.
@@ -48,7 +49,7 @@ Código: `src/pages/Index.tsx`, `src/components/moni/*` (`MoniHeader`, `MoniHero
 5. **Encomende Seu Favorito**: fundo rosa suave com flores, bolo em destaque e botão de encomenda.
 
 Movimento com GSAP + ScrollTrigger (sem Lenis: rolagem nativa). Só transform, opacity e clip-path. Com
-"reduzir movimento" nada se anima; sem JavaScript tudo fica visível. No celular não há pin, só revelações leves.
+"reduzir movimento" ficam só fades de opacidade; sem JavaScript tudo fica visível. No celular não há pin: o título desce e apaga atrás do bolo no primeiro ecrã, e cada bloco entra uma vez ao chegar ao ecrã (os passos pousam de cima, como camadas). Hover só com rato.
 O botão de encomenda vai para o WhatsApp configurado no Admin (Aparência > WhatsApp); sem número, para `/contatos`.
 
 ## Detalhe do bolo (`/produto/:id`)
