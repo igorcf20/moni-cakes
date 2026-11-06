@@ -9,8 +9,9 @@
 //  - Cena 4: painel com clip-path, câmera simulada (escala) e parallax nas flores.
 //  - Cena 5: convite final com o bolo e o botão.
 //
-// Tudo só com transform e opacity (e clip-path no painel). Com "reduzir movimento" no sistema nada disto corre e
-// a página fica estática e completa; sem JavaScript também. Rolagem nativa (sem Lenis): âncoras, teclado e
+// Celular e tablet: entradas únicas por IntersectionObserver (skill scroll-craft, ver scrollReveals).
+// Tudo só com transform e opacity (e clip-path no painel). Com "reduzir movimento" ficam só fades de opacidade;
+// sem JavaScript a página fica estática e completa. Rolagem nativa (sem Lenis): âncoras, teclado e
 // leitores de ecrã funcionam como sempre.
 import { useLayoutEffect, type RefObject } from 'react';
 import gsap from 'gsap';
@@ -152,7 +153,7 @@ export function useMoniMotion(root: RefObject<HTMLElement>, ready: boolean) {
     mm.add({ always: 'all', motion: '(prefers-reduced-motion: no-preference)', desktop: '(min-width: 1024px)' }, (ctx) => {
       const { motion, desktop } = ctx.conditions as Record<string, boolean>;
       if (desktop && motion) desktopScenes(el);
-      else scrollReveals(el, motion);
+      else { const stopReveals = scrollReveals(el, motion); ctx.add(() => stopReveals); }
       ScrollTrigger.refresh();
       const stop = refreshOnResize(el);
       ctx.add(() => stop);
@@ -162,59 +163,83 @@ export function useMoniMotion(root: RefObject<HTMLElement>, ready: boolean) {
 }
 
 /**
- * Celular e tablet (e qualquer ecrã com "reduzir movimento"): cada bloco surge acompanhando o dedo. A animação
- * está presa à posição da rolagem (scrub), não ao relógio: rolar devagar revela devagar, voltar para cima desfaz.
- * Com "reduzir movimento" fica só a opacidade, sem deslocamentos nem zoom.
+ * Celular e tablet (e qualquer ecrã com "reduzir movimento"), pelas regras da skill scroll-craft:
+ *  - Seções comuns ("flow + in"): cada bloco entra uma vez, quando chega a ~12% do fundo do ecrã, com
+ *    IntersectionObserver (não depende das posições do ScrollTrigger, que no celular mudam com a barra de endereço
+ *    e as imagens). Opacidade e uma subida curta (14px, cartões 22px a partir de scale 0.95) em 620ms com ease-out
+ *    forte, irmãos em sequência de 60ms na ordem de leitura. O que já entrou não volta a esconder ao subir.
+ *  - Profundidade presa ao dedo (scrub) só onde é cena: fatia em detalhe, painel da celebração e flores soltas.
+ *  - "Reduzir movimento" = menos e mais suave, não zero: fica só a opacidade, sem deslocamentos nem zoom.
  */
-function scrollReveals(el: HTMLElement, motion: boolean) {
-  const reveal = (node: Element, from: gsap.TweenVars, start = 'top 96%', end = 'top 64%') =>
-    gsap.fromTo(node, { autoAlpha: 0, ...(motion ? from : {}) }, {
-      autoAlpha: 1, ...(motion ? { x: 0, y: 0, scale: 1, rotation: 0 } : {}), ease: 'none',
-      scrollTrigger: { trigger: node, start, end, scrub: 0.5 },
-    });
+const EASE_IN = 'expo.out';
+function scrollReveals(el: HTMLElement, motion: boolean): () => void {
+  let stop = () => undefined as void;
   const sections = q(el, '[data-mc-cakes], [data-mc-detail], [data-mc-celebrate], [data-mc-final]');
-
-  // Títulos por máscara: cada linha sobe de dentro da sua faixa enquanto se rola.
-  sections.forEach((sec) => q(sec, '[data-mc-reveal-line]').forEach((line) => {
-    gsap.fromTo(line, motion ? { yPercent: 110 } : { autoAlpha: 0 }, {
-      ...(motion ? { yPercent: 0 } : { autoAlpha: 1 }), ease: 'none',
-      scrollTrigger: { trigger: line.parentElement ?? line, start: 'top 94%', end: 'top 70%', scrub: 0.5 },
-    });
-  }));
-  // Textos curtos, passos e textos do painel.
-  sections.forEach((sec) => q(sec, '[data-mc-fade], [data-mc-step], [data-mc-celebrate-text]').forEach((n) => reveal(n, { y: 34 })));
-
-  // Cartões de Nossos Bolos: o cartão sobe e a foto abre de dentro (máscara + leve zoom), um a um.
-  q(el, '[data-mc-card]').forEach((card, i) => {
-    reveal(card, { y: 70, scale: 0.94, x: i % 2 ? 14 : -14 }, 'top 98%', 'top 58%');
-    if (!motion) return;
-    const img = card.querySelector('img');
-    if (img) gsap.fromTo(img, { scale: 1.18 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: card, start: 'top 98%', end: 'top 40%', scrub: 0.5 } });
+  type Kind = 'line' | 'text' | 'card' | 'cake';
+  const kinds = new Map<Element, Kind>();
+  sections.forEach((sec) => {
+    q(sec, '[data-mc-reveal-line]').forEach((n) => kinds.set(n, 'line'));
+    q(sec, '[data-mc-fade], [data-mc-step], [data-mc-celebrate-text]').forEach((n) => kinds.set(n, 'text'));
+    q(sec, '[data-mc-card]').forEach((n) => kinds.set(n, 'card'));
+    q(sec, '[data-mc-final-cake]').forEach((n) => kinds.set(n, 'cake'));
   });
+  const hidden: Record<Kind, gsap.TweenVars> = motion
+    ? { line: { yPercent: 110 }, text: { autoAlpha: 0, y: 14 }, card: { autoAlpha: 0, y: 22, scale: 0.95 }, cake: { autoAlpha: 0, y: 24, scale: 0.96 } }
+    : { line: { autoAlpha: 0 }, text: { autoAlpha: 0 }, card: { autoAlpha: 0 }, cake: { autoAlpha: 0 } };
+  const shown: Record<Kind, gsap.TweenVars> = motion
+    ? { line: { yPercent: 0, duration: 0.9 }, text: { autoAlpha: 1, y: 0, duration: 0.62 }, card: { autoAlpha: 1, y: 0, scale: 1, duration: 0.7 }, cake: { autoAlpha: 1, y: 0, scale: 1, duration: 0.9 } }
+    : { line: { autoAlpha: 1, duration: 0.5 }, text: { autoAlpha: 1, duration: 0.5 }, card: { autoAlpha: 1, duration: 0.5 }, cake: { autoAlpha: 1, duration: 0.5 } };
+  kinds.forEach((kind, node) => gsap.set(node, hidden[kind]));
 
-  if (motion) {
-    // Fatia em detalhe: aproxima enquanto a seção passa.
-    q(el, '[data-mc-detail-zoom]').forEach((n) => gsap.fromTo(n, { scale: 1 }, { scale: 1.15, ease: 'none',
-      scrollTrigger: { trigger: n.closest('[data-mc-detail]') ?? n, start: 'top bottom', end: 'bottom top', scrub: true } }));
-    // Painel da celebração: abre por máscara e a "câmera" recua.
-    const celebrate = el.querySelector<HTMLElement>('[data-mc-celebrate]');
-    if (celebrate) {
-      const st = { trigger: celebrate, start: 'top 90%', end: 'top 20%', scrub: 0.5 };
-      gsap.fromTo(celebrate.querySelector('[data-mc-celebrate-panel]'), { clipPath: 'inset(8% 8% 8% 8% round 40px)' },
-        { clipPath: 'inset(0% 0% 0% 0% round 32px)', ease: 'none', scrollTrigger: st });
-      gsap.fromTo(q(celebrate, '[data-mc-celebrate-camera]'), { scale: 1.18 }, { scale: 1, ease: 'none', scrollTrigger: { ...st, end: 'bottom 40%' } });
-    }
-    // Bolo do convite final sobe e assenta.
-    q(el, '[data-mc-final-cake]').forEach((n) => reveal(n, { y: 80, scale: 1.08 }, 'top 95%', 'top 55%'));
-    // Flores e pétalas soltas em velocidades diferentes.
-    q(el, '[data-mc-depth]').forEach((node) => {
-      const d = Number(node.dataset.mcDepth ?? 1);
-      gsap.fromTo(node, { y: 40 * d }, { y: -40 * d, rotation: d * 6, ease: 'none',
-        scrollTrigger: { trigger: node.closest('section') ?? node, start: 'top bottom', end: 'bottom top', scrub: true } });
+  const enter = (nodes: Element[]) => {
+    nodes.sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
+    nodes.forEach((node, i) => {
+      const kind = kinds.get(node)!;
+      gsap.to(node, { ...shown[kind], ease: EASE_IN, delay: i * 0.06, overwrite: 'auto' });
+      const img = kind === 'card' && motion ? node.querySelector('img') : null;
+      if (img) gsap.fromTo(img, { scale: 1.08 }, { scale: 1, duration: 1.1, ease: EASE_IN, delay: i * 0.06 });
     });
+  };
+  // A linha do título é observada pela sua faixa (a própria linha está deslocada para fora da máscara).
+  const target = (node: Element) => (kinds.get(node) === 'line' ? node.parentElement ?? node : node);
+  const byTarget = new Map<Element, Element[]>();
+  kinds.forEach((_k, node) => { const t = target(node); byTarget.set(t, [...(byTarget.get(t) ?? []), node]); });
+
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      const batch: Element[] = [];
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        io.unobserve(e.target);
+        batch.push(...(byTarget.get(e.target) ?? []));
+      });
+      if (batch.length) enter(batch);
+    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.01 });
+    byTarget.forEach((_n, t) => io.observe(t));
+    stop = () => io.disconnect();
   } else {
-    q(el, '[data-mc-final-cake]').forEach((n) => reveal(n, {}));
+    enter([...kinds.keys()]);
   }
+
+  if (!motion) return stop;
+  // Fatia em detalhe: aproxima enquanto a seção passa.
+  q(el, '[data-mc-detail-zoom]').forEach((n) => gsap.fromTo(n, { scale: 1 }, { scale: 1.12, ease: 'none',
+    scrollTrigger: { trigger: n.closest('[data-mc-detail]') ?? n, start: 'top bottom', end: 'bottom top', scrub: true } }));
+  // Painel da celebração: abre por máscara e a "câmera" recua, presos ao dedo.
+  const celebrate = el.querySelector<HTMLElement>('[data-mc-celebrate]');
+  if (celebrate) {
+    const st = { trigger: celebrate, start: 'top 90%', end: 'top 25%', scrub: 0.5 };
+    gsap.fromTo(celebrate.querySelector('[data-mc-celebrate-panel]'), { clipPath: 'inset(6% 6% 6% 6% round 36px)' },
+      { clipPath: 'inset(0% 0% 0% 0% round 28px)', ease: 'none', scrollTrigger: st });
+    gsap.fromTo(q(celebrate, '[data-mc-celebrate-camera]'), { scale: 1.12 }, { scale: 1, ease: 'none', scrollTrigger: { ...st, end: 'bottom 40%' } });
+  }
+  // Flores e pétalas soltas em velocidades diferentes (profundidade).
+  q(el, '[data-mc-depth]').forEach((node) => {
+    const d = Number(node.dataset.mcDepth ?? 1);
+    gsap.fromTo(node, { y: 30 * d }, { y: -30 * d, rotation: d * 5, ease: 'none',
+      scrollTrigger: { trigger: node.closest('section') ?? node, start: 'top bottom', end: 'bottom top', scrub: true } });
+  });
+  return stop;
 }
 
 /** Computador com movimento: cenas fixas (pin) e entradas em sequência. */
