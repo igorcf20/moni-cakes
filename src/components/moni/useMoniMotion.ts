@@ -9,7 +9,7 @@
 //  - Cena 4: painel com clip-path, câmera simulada (escala) e parallax nas flores.
 //  - Cena 5: convite final com o bolo e o botão.
 //
-// Celular e tablet: entradas únicas por IntersectionObserver, ativas desde a montagem (ver scrollReveals).
+// Celular e tablet: entradas presas à rolagem (scrub), ativas desde a montagem (ver scrollReveals).
 // Tudo só com transform e opacity (e clip-path no painel). Com "reduzir movimento" ficam só fades de opacidade;
 // sem JavaScript a página fica estática e completa. Rolagem nativa (sem Lenis): âncoras, teclado e
 // leitores de ecrã funcionam como sempre.
@@ -126,7 +126,7 @@ export function useMoniMotion(root: RefObject<HTMLElement>, ready: boolean) {
           const stage = hero.querySelector('[data-mc-stage]');
           const scroll = gsap.timeline({
             defaults: { ease: 'none' },
-            scrollTrigger: { trigger: hero, start: 'top top', end: '+=55%', scrub: 0.4 },
+            scrollTrigger: { trigger: hero, start: 'top top', end: '+=70%', scrub: 0.4 },
           });
           scroll
             .to(q(hero, '[data-mc-title]'), { yPercent: 30, opacity: 0, duration: 1 }, 0)
@@ -181,17 +181,17 @@ export function useMoniMotion(root: RefObject<HTMLElement>, ready: boolean) {
 }
 
 /**
- * Celular e tablet (e qualquer ecrã com "reduzir movimento"):
- *  - Cada bloco entra uma vez, quando chega a ~12% do fundo do ecrã, com IntersectionObserver (não depende das
- *    posições do ScrollTrigger, que no celular mudam com a barra de endereço e as imagens). Opacidade e um
- *    deslocamento curto em 620ms com ease-out forte; irmãos em sequência de 60ms na ordem de leitura.
- *  - Títulos sobem da máscara; cartões sobem e a foto assenta; os passos pousam de cima, como camadas de bolo.
- *  - O que já ficou para trás nunca fica escondido: salto por âncora, rolagem rápida ou catálogo que chega tarde.
- *  - Só opacidade, nunca visibility: o que ainda não entrou continua a ser lido e a receber o foco do teclado.
- *  - Profundidade presa ao dedo (scrub) só onde é cena: fatia em detalhe, painel da celebração e flores soltas.
- *  - "Reduzir movimento" = menos e mais suave, não zero: fica só a opacidade, sem deslocamentos nem zoom.
+ * Celular e tablet (e qualquer ecrã com "reduzir movimento"): cada bloco surge PRESO À ROLAGEM (scrub). A posição
+ * do dedo decide o quadro: rolar devagar mostra a entrada devagar, um arrasto rápido também a mostra (não há
+ * relógio que o gesto possa ultrapassar) e voltar para cima desfaz.
+ *  - Entrada ao longo de ~35% do ecrã, começando acima da barra de baixo, com deslocamento largo (textos 36px,
+ *    cartões 80px com escala 0,92, bolo final 70px); títulos sobem da máscara; passos pousam de cima.
+ *  - O que já ficou para trás (salto por âncora, rolagem rápida, catálogo que chega tarde) está no estado final
+ *    pela posição: nunca fica escondido.
+ *  - Só opacidade e transform, nunca visibility: o que ainda não entrou continua a ser lido e a receber o foco.
+ *  - "Reduzir movimento" = menos e mais suave, não zero: fica só a opacidade, também presa à rolagem.
+ *  - Profundidade extra presa ao dedo: fatia em detalhe, painel da celebração e flores soltas.
  */
-const EASE_IN = 'expo.out';
 type RevealKind = 'line' | 'text' | 'step' | 'card' | 'cake';
 const REVEAL_NODES: [string, RevealKind][] = [
   ['[data-mc-reveal-line]', 'line'],
@@ -201,62 +201,34 @@ const REVEAL_NODES: [string, RevealKind][] = [
   ['[data-mc-final-cake]', 'cake'],
 ];
 function scrollReveals(el: HTMLElement, motion: boolean): { scan: () => void; stop: () => void } {
-  const hidden: Record<RevealKind, gsap.TweenVars> = motion
-    ? { line: { yPercent: 110 }, text: { opacity: 0, y: 14 }, step: { opacity: 0, y: -14 }, card: { opacity: 0, y: 22, scale: 0.95 }, cake: { opacity: 0, y: 24, scale: 0.96 } }
+  const from: Record<RevealKind, gsap.TweenVars> = motion
+    ? { line: { yPercent: 110 }, text: { opacity: 0, y: 36 }, step: { opacity: 0, y: -30 }, card: { opacity: 0, y: 80, scale: 0.92 }, cake: { opacity: 0, y: 70, scale: 0.94 } }
     : { line: { opacity: 0 }, text: { opacity: 0 }, step: { opacity: 0 }, card: { opacity: 0 }, cake: { opacity: 0 } };
-  const shown: Record<RevealKind, gsap.TweenVars> = motion
-    ? { line: { yPercent: 0, duration: 0.9 }, text: { opacity: 1, y: 0, duration: 0.62 }, step: { opacity: 1, y: 0, duration: 0.7 }, card: { opacity: 1, y: 0, scale: 1, duration: 0.7 }, cake: { opacity: 1, y: 0, scale: 1, duration: 0.9 } }
-    : { line: { opacity: 1, duration: 0.5 }, text: { opacity: 1, duration: 0.5 }, step: { opacity: 1, duration: 0.5 }, card: { opacity: 1, duration: 0.5 }, cake: { opacity: 1, duration: 0.5 } };
-  const kinds = new Map<Element, RevealKind>();
-  const waiting = new Map<Element, Element[]>(); // alvo observado -> blocos que entram com ele
-
-  const enter = (nodes: Element[]) => {
-    nodes.sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
-    nodes.forEach((node, i) => {
-      const kind = kinds.get(node)!;
-      const delay = Math.min(i, 6) * 0.06;
-      // clearProps: o transform inline bloquearia o hover e o :active dos cartões e botões.
-      gsap.to(node, { ...shown[kind], ease: EASE_IN, delay, overwrite: 'auto', clearProps: 'transform' });
-      const img = kind === 'card' && motion ? node.querySelector('img') : null;
-      if (img) gsap.fromTo(img, { scale: 1.08 }, { scale: 1, duration: 1.1, ease: EASE_IN, delay, clearProps: 'transform' });
-    });
+  const to: Record<RevealKind, gsap.TweenVars> = motion
+    ? { line: { yPercent: 0 }, text: { opacity: 1, y: 0 }, step: { opacity: 1, y: 0 }, card: { opacity: 1, y: 0, scale: 1 }, cake: { opacity: 1, y: 0, scale: 1 } }
+    : { line: { opacity: 1 }, text: { opacity: 1 }, step: { opacity: 1 }, card: { opacity: 1 }, cake: { opacity: 1 } };
+  const range: Record<RevealKind, [string, string]> = {
+    line: ['top 94%', 'top 66%'], text: ['top 94%', 'top 62%'], step: ['top 94%', 'top 60%'],
+    card: ['top 96%', 'top 52%'], cake: ['top 94%', 'top 50%'],
   };
-  const io = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
-    const batch: Element[] = [];
-    entries.forEach((e) => {
-      if (!e.isIntersecting) return;
-      io!.unobserve(e.target);
-      batch.push(...(waiting.get(e.target) ?? []));
-      waiting.delete(e.target);
-    });
-    if (batch.length) enter(batch);
-    // O que ficou acima do ecrã sem chegar a ser visto aparece já, sem animar: ninguém está a olhar.
-    waiting.forEach((nodes, t) => {
-      if (t.getBoundingClientRect().bottom >= 0) return;
-      io!.unobserve(t);
-      waiting.delete(t);
-      nodes.forEach((n) => gsap.set(n, { ...shown[kinds.get(n)!], duration: undefined, clearProps: 'transform' }));
-    });
-  }, { rootMargin: '0px 0px -12% 0px', threshold: 0.01 }) : null;
+  const known = new Set<Element>();
 
   // Pode correr de novo: só apanha o que ainda não conhece (os cartões chegam depois do catálogo).
   const scan = () => {
-    if (!io) return; // sem IntersectionObserver a página fica estática e completa
     REVEAL_NODES.forEach(([sel, kind]) => q(el, sel).forEach((node) => {
-      if (kinds.has(node)) return;
-      kinds.set(node, kind);
-      // A linha do título é observada pela sua faixa (a própria linha está deslocada para fora da máscara).
-      const t = kind === 'line' ? node.parentElement ?? node : node;
-      const box = t.getBoundingClientRect();
-      if (!t.getClientRects().length || box.bottom < 0) return; // sem caixa (display: none) ou já para trás
-      gsap.set(node, hidden[kind]);
-      waiting.set(t, [...(waiting.get(t) ?? []), node]);
-      io.observe(t);
+      if (known.has(node)) return;
+      known.add(node);
+      // A linha do título é seguida pela sua faixa (a própria linha está deslocada para fora da máscara).
+      const trigger = kind === 'line' ? node.parentElement ?? node : node;
+      if (!trigger.getClientRects().length) return; // sem caixa (display: none)
+      const [start, end] = range[kind];
+      gsap.fromTo(node, from[kind], { ...to[kind], ease: 'none', scrollTrigger: { trigger, start, end, scrub: 0.6 } });
+      const img = kind === 'card' && motion ? node.querySelector('img') : null;
+      if (img) gsap.fromTo(img, { scale: 1.16 }, { scale: 1, ease: 'none', scrollTrigger: { trigger, start, end: 'top 30%', scrub: 0.6 } });
     }));
   };
   scan();
-  const stop = () => io?.disconnect();
-  const api = { scan, stop };
+  const api = { scan, stop: () => undefined };
 
   if (!motion) return api;
   // Fatia em detalhe: aproxima enquanto a seção passa.
