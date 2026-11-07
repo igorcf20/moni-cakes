@@ -109,6 +109,11 @@ export function MoniHero({ active, onSelect, order }: {
       <div className="mc-hero__bg" data-mc-bg />
       <div className="mc-hero__light" data-mc-light />
       <div className="mc-hero__floor" aria-hidden="true" />
+      {/* Abertura de cena: faixa de luz que atravessa o título e faixas de cinema que se afastam do centro.
+          Sem JavaScript (ou com "reduzir movimento") ficam fora de vista. */}
+      <div className="mc-hero__sheen" data-mc-sheen aria-hidden="true" />
+      <div className="mc-letterbox mc-letterbox--top" data-mc-letterbox aria-hidden="true" />
+      <div className="mc-letterbox mc-letterbox--bottom" data-mc-letterbox aria-hidden="true" />
       {/* Maré creme: sobe com a rolagem (cena 2) e liga o hero ao catálogo sem corte. */}
       <div className="mc-hero__tide" data-mc-cream aria-hidden="true">
         <svg viewBox="0 0 1440 110" preserveAspectRatio="none"><path fill="currentColor" d="M0,62 C180,20 360,96 560,70 C760,44 900,6 1100,30 C1260,50 1360,84 1440,70 L1440,110 L0,110 Z" /></svg>

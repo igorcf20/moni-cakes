@@ -16,11 +16,18 @@ function OrderLink({ order, className, children }: { order: Order; className: st
     : <Link to={order.href} className={className}>{children}</Link>;
 }
 
-/** Título com revelação por máscara (cada linha sobe de dentro de uma caixa com overflow escondido). */
+/** Título com revelação por máscara palavra a palavra (cada palavra sobe de dentro de uma caixa com overflow
+ *  escondido; as palavras quebram linha como texto normal, por isso a revelação segue as linhas). */
 function RevealTitle({ text, className, id }: { text: string; className?: string; id?: string }) {
+  const words = text.split(' ');
   return (
     <h2 id={id} className={`mc-display ${className ?? ''}`} data-mc-reveal-title>
-      <span className="inline-block overflow-hidden pb-[0.08em] align-top"><span className="inline-block" data-mc-reveal-line>{text}</span></span>
+      {words.map((w, i) => (
+        <span key={i}>
+          <span className="mc-mask"><span className="inline-block" data-mc-reveal-line data-mc-i={i}>{w}</span></span>
+          {i < words.length - 1 ? ' ' : null}
+        </span>
+      ))}
     </h2>
   );
 }
