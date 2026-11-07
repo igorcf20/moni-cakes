@@ -98,6 +98,48 @@ html body .moni-home .mc-serif.mc-serif {
   background: linear-gradient(90deg, transparent, rgba(255, 236, 226, 0.55), transparent);
   filter: blur(1px);
 }
+/* Abertura de cena: faixas de cinema (cobrem o hero no primeiro quadro e afastam-se do centro) e a faixa de luz
+   que atravessa o título uma vez. Estado de repouso = fora de vista; só o GSAP as traz. */
+/* Medidas presas ao primeiro ecrã (no celular o hero é mais alto que o ecrã). */
+.mc-letterbox {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: calc(50svh + 1px);
+  z-index: 9;
+  pointer-events: none;
+  background: #2b140d;
+  transform: scaleY(0);
+}
+.mc-letterbox--top { top: 0; transform-origin: 50% 0; }
+.mc-letterbox--bottom { top: calc(50svh - 1px); transform-origin: 50% 100%; }
+.mc-hero__sheen {
+  position: absolute;
+  top: 0;
+  left: -25%;
+  right: -25%;
+  height: 100svh;
+  z-index: 5;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 244, 236, 0.32) 48%, rgba(255, 250, 244, 0.5) 50%, rgba(255, 244, 236, 0.32) 52%, transparent 62%);
+  transform: translateX(-150%);
+}
+
+/* Grão de filme leve sobre a página inteira (estático: não custa nada durante a rolagem). */
+.moni-home::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.23 0 0 0 0 0.12 0 0 0 0 0.08 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* Máscara de cada palavra dos títulos das seções (revelação palavra a palavra). */
+.mc-mask { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.08em; }
+
 .mc-hero__wave {
   position: absolute;
   left: 0;

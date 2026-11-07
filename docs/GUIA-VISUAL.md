@@ -49,7 +49,23 @@ Código: `src/pages/Index.tsx`, `src/components/moni/*` (`MoniHeader`, `MoniHero
 5. **Encomende Seu Favorito**: fundo rosa suave com flores, bolo em destaque e botão de encomenda.
 
 Movimento com GSAP + ScrollTrigger (sem Lenis: rolagem nativa). Só transform, opacity e clip-path. Com
-"reduzir movimento" ficam só fades de opacidade; sem JavaScript tudo fica visível. No celular não há pin: o título desce e apaga atrás do bolo no primeiro ecrã, e cada bloco entra uma vez ao chegar ao ecrã (os passos pousam de cima, como camadas). Hover só com rato.
+"reduzir movimento" ficam só fades de opacidade; sem JavaScript tudo fica visível. Hover só com rato.
+
+**Direção cinematográfica (7/11/2026, método scroll-craft).** Curva de sensações: expectativa (abertura), apetite
+(Nossos Bolos), intimidade (pico), alegria (Celebrar), decisão (convite). Um só pico: O Sabor em Cada Detalhe, com o
+maior espaço de rolagem e uma seção calma antes dele.
+- Abertura: faixas de cinema café (`.mc-letterbox`) cobrem o primeiro ecrã e afastam-se do centro; uma faixa de luz
+  (`.mc-hero__sheen`) atravessa o título uma vez; título sobe da máscara e o bolo assenta.
+- Profundidade no hero: fundo, luz, título, bolo, decoração e pétalas em velocidades diferentes (no computador a luz
+  também segue o rato, ao contrário das camadas).
+- Grão de filme estático sobre a página (`.moni-home::after`, 7% de opacidade).
+- Títulos das seções revelados palavra a palavra (`.mc-mask`), em onda; cartões abrem por máscara de baixo para cima.
+- Pico: íris (`clip-path: circle`) que se abre sobre a fatia enquanto a câmera recua; massa, recheio e cobertura
+  pousam de cima um a um (movimento assinatura: o bolo monta-se).
+- Celebrar: o painel abre a partir de uma faixa estreita e arredondada. Convite final: corte de cena (a seção sobe
+  com os cantos arredondados que se abrem até à largura toda).
+- Celular: sem pin, tudo preso à rolagem; cada entrada começa a 88% do ecrã (acima da barra de baixo) e mexe 56 a
+  110px ou abre por máscara, para se notar num arrasto rápido. Teste: `scripts/test-home-motion.cjs`.
 O botão de encomenda vai para o WhatsApp configurado no Admin (Aparência > WhatsApp); sem número, para `/contatos`.
 
 ## Detalhe do bolo (`/produto/:id`)
